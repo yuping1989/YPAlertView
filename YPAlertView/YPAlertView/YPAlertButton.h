@@ -31,6 +31,10 @@ typedef NS_ENUM(NSInteger, YPAlertButtonStyle) {
 @property (nonatomic, assign) YPAlertButtonStyle style;
 @property (nonatomic, copy) void (^handler)(YPAlertButton *button);
 
+@property (nonatomic, assign) BOOL autoDismiss;
+
+@property (nonatomic, assign) NSInteger index;
+
 + (instancetype)buttonWithTitle:(NSString *)title style:(YPAlertButtonStyle)style handler:(void (^)(YPAlertButton *button))handler;
 
 @end

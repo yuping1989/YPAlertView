@@ -37,6 +37,7 @@
         _destructiveTitleColor = [[[self class] appearance] destructiveTitleColor] ?: [UIColor blackColor];
         _destructiveTitleFont = [[[self class] appearance] destructiveTitleFont] ?: [UIFont systemFontOfSize:17];
         
+        _autoDismiss = YES;
         self.style = YPAlertButtonStyleDefault;
     }
     return self;

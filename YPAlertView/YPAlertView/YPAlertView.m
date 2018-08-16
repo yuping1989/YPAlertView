@@ -22,6 +22,8 @@
 
 @property (nonatomic, strong, readwrite) UIView *buttonsView;
 
+@property (nonatomic, assign) CGFloat customViewHeight;
+
 @property (nonatomic, strong, readwrite) NSMutableArray *buttons;
 
 @end
@@ -38,6 +40,15 @@
     return self;
 }
 
++ (instancetype)alertWithTitle:(NSString *)title message:(NSString *)message {
+    return [[self alloc] initWithTitle:title message:message];
+}
+
++ (instancetype)alertWithTitle:(NSString *)title
+             attributedMessage:(NSAttributedString *)message {
+    return [[self alloc] initWithTitle:title attributedMessage:message];
+}
+
 - (instancetype)initWithTitle:(NSString *)title
                       message:(NSString *)message {
     self = [super init];
@@ -46,6 +57,18 @@
         
         _titleLabel.text = title;
         _messageLabel.text = message;
+    }
+    return self;
+}
+
+- (instancetype)initWithTitle:(NSString *)title
+            attributedMessage:(NSAttributedString *)message {
+    self = [super init];
+    if (self) {
+        [self _setup];
+        
+        _titleLabel.text = title;
+        _messageLabel.attributedText = message;
     }
     return self;
 }
@@ -59,11 +82,21 @@
     [self.buttonsView addSubview:button];
 }
 
+- (void)addButtonWithTitle:(NSString *)title
+                     style:(YPAlertButtonStyle)style
+                   handler:(void (^)(YPAlertButton *))handler {
+    YPAlertButton *button = [YPAlertButton buttonWithTitle:title style:style handler:handler];
+    [self addButton:button];
+}
+
 - (void)show {
-    
     UIWindow *window = [UIApplication sharedApplication].windows.firstObject;
-    [window addSubview:self.maskView];
-    [window addSubview:self];
+    [self showInView:window];
+}
+
+- (void)showInView:(UIView *)view {
+    [view addSubview:self.maskView];
+    [view addSubview:self];
     [self layout];
     [self addSeperators];
     
@@ -125,19 +158,29 @@
     self.messageLabel.font = messageFont;
 }
 
+- (void)setCustomView:(UIView *)view height:(CGFloat)height {
+    self.customView = view;
+    self.customViewHeight = height;
+}
+
+- (void)setCustomView:(UIView *)customView {
+    _customView = customView;
+    [self addSubview: customView];
+}
+
 #pragma mark - 内部方法
 
 - (void)_setup {
-    self.buttons = [NSMutableArray array];
+    _buttons = [NSMutableArray array];
     
     _titleEdgeInsets = [[[self class] appearance] titleEdgeInsets];
     if (UIEdgeInsetsEqualToEdgeInsets(_titleEdgeInsets, UIEdgeInsetsZero)) {
-        _titleEdgeInsets = UIEdgeInsetsMake(15, 10, 15, 10);
+        _titleEdgeInsets = UIEdgeInsetsMake(10, 10, 11, 10);
     }
     
     _messageEdgeInsets = [[[self class] appearance] messageEdgeInsets];
     if (UIEdgeInsetsEqualToEdgeInsets(_messageEdgeInsets, UIEdgeInsetsZero)) {
-        _messageEdgeInsets = UIEdgeInsetsMake(20, 10, 20, 10);
+        _messageEdgeInsets = UIEdgeInsetsMake(20, 15, 20, 15);
     }
     
     _alertViewWidth = [[[self class] appearance] alertViewWidth];
@@ -267,6 +310,19 @@
         make.edges.equalTo(strongSelf.messageView).insets(insets);
     }];
     
+    UIView *buttonTopView = self.messageView;
+    if (self.customView) {
+        buttonTopView = self.customView;
+        [weakSelf.customView mas_makeConstraints:^(MASConstraintMaker *make) {
+            __strong typeof(self) strongSelf = weakSelf;
+            make.top.equalTo(strongSelf.messageView.mas_bottom);
+            make.left.right.equalTo(strongSelf);
+            if (strongSelf.customViewHeight > 0) {
+                make.height.equalTo(@(strongSelf.customView.frame.size.height));
+            }
+        }];
+    }
+    
     CGFloat buttonViewHeight;
     if (self.buttons.count == 0) {
         buttonViewHeight = 0;
@@ -302,7 +358,7 @@
         __strong typeof(self) strongSelf = weakSelf;
         make.left.right.bottom.equalTo(strongSelf);
         make.height.equalTo(@(buttonViewHeight));
-        make.top.equalTo(strongSelf.messageView.mas_bottom);
+        make.top.equalTo(buttonTopView.mas_bottom);
     }];
 }
 
@@ -346,7 +402,9 @@
     if (button.handler) {
         button.handler(button);
     }
-    [self dismiss];
+    if (button.autoDismiss) {
+        [self dismiss];
+    }
 }
 
 + (CGFloat)onePixel {
@@ -356,6 +414,66 @@
     } else {
         return 1.0f / mainScreen.scale;
     }
+}
+
+@end
+
+@implementation YPAlertView (Add)
+
++ (instancetype)showWithTitle:(NSString *)title {
+    return [self showWithTitle:title message:nil];
+}
+
++ (instancetype)showWithTitle:(NSString *)title
+                      message:(NSString *)message {
+    return [self showWithTitle:title
+                       message:message
+             cancelButtonTitle:nil
+                 okButtonTitle:@"我知道了"
+                       handler:nil];
+}
+
++ (instancetype)showWithTitle:(NSString *)title
+                      message:(NSString *)message
+                okButtonTitle:(NSString *)okButtonTitle
+              okButtonClicked:(void (^)(void))okButtonClicked {
+    return [self showWithTitle:title
+                       message:message
+             cancelButtonTitle:@"取消"
+                 okButtonTitle:okButtonTitle
+                       handler:^(BOOL isOkButton) {
+                           if (okButtonClicked && isOkButton) {
+                               okButtonClicked();
+                           }
+                       }];
+}
+
++ (instancetype)showWithTitle:(NSString *)title
+                      message:(NSString *)message
+            cancelButtonTitle:(NSString *)cancelButtonTitle
+                okButtonTitle:(NSString *)okButtonTitle
+                      handler:(void (^)(BOOL))handler {
+    YPAlertView *alert = [[YPAlertView alloc] initWithTitle:title message:message];
+    if (cancelButtonTitle) {
+        [alert addButtonWithTitle:cancelButtonTitle
+                            style:YPAlertButtonStyleCancel
+                          handler:^(YPAlertButton *button) {
+                              if (handler) {
+                                  handler(NO);
+                              }
+                          }];
+    }
+    if (okButtonTitle) {
+        [alert addButtonWithTitle:okButtonTitle
+                            style:YPAlertButtonStyleDestructive
+                          handler:^(YPAlertButton *button) {
+                              if (handler) {
+                                  handler(YES);
+                              }
+                          }];
+    }
+    [alert show];
+    return alert;
 }
 
 @end
