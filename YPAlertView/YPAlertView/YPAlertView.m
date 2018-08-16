@@ -266,59 +266,51 @@
         make.left.top.right.bottom.equalTo(window);
     }];
     
-    __weak typeof(self) weakSelf = self;
-    [weakSelf mas_makeConstraints:^(MASConstraintMaker *make) {
-        __strong typeof(self) strongSelf = weakSelf;
-        make.width.equalTo(@(strongSelf.alertViewWidth));
+    [self mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.equalTo(@(self.alertViewWidth));
         make.center.equalTo(window);
     }];
     
     
-    [weakSelf.titleView mas_makeConstraints:^(MASConstraintMaker *make) {
-        __strong typeof(self) strongSelf = weakSelf;
-        make.left.right.top.equalTo(strongSelf);
+    [self.titleView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.top.equalTo(self);
     }];
     
     if (_titleBgImageView) {
-        [weakSelf.titleBgImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-            __strong typeof(self) strongSelf = weakSelf;
-            make.edges.equalTo(strongSelf.titleView);
+        [self.titleBgImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.edges.equalTo(self.titleView);
         }];
     }
     
-    [weakSelf.titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        __strong typeof(self) strongSelf = weakSelf;
+    [self.titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         UIEdgeInsets insets = UIEdgeInsetsZero;
-        if (strongSelf.titleLabel.text) {
-            insets = strongSelf.titleEdgeInsets;
+        if (self.titleLabel.text) {
+            insets = self.titleEdgeInsets;
         }
-        make.edges.equalTo(strongSelf.titleView).insets(insets);
+        make.edges.equalTo(self.titleView).insets(insets);
     }];
     
-    [weakSelf.messageView mas_makeConstraints:^(MASConstraintMaker *make) {
-        __strong typeof(self) strongSelf = weakSelf;
-        make.left.right.equalTo(strongSelf);
-        make.top.equalTo(strongSelf.titleView.mas_bottom);
+    [self.messageView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.equalTo(self);
+        make.top.equalTo(self.titleView.mas_bottom);
     }];
     
-    [weakSelf.messageLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        __strong typeof(self) strongSelf = weakSelf;
+    [self.messageLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         UIEdgeInsets insets = UIEdgeInsetsZero;
-        if (strongSelf.messageLabel.text) {
-            insets = strongSelf.messageEdgeInsets;
+        if (self.messageLabel.text) {
+            insets = self.messageEdgeInsets;
         }
-        make.edges.equalTo(strongSelf.messageView).insets(insets);
+        make.edges.equalTo(self.messageView).insets(insets);
     }];
     
     UIView *buttonTopView = self.messageView;
     if (self.customView) {
         buttonTopView = self.customView;
-        [weakSelf.customView mas_makeConstraints:^(MASConstraintMaker *make) {
-            __strong typeof(self) strongSelf = weakSelf;
-            make.top.equalTo(strongSelf.messageView.mas_bottom);
-            make.left.right.equalTo(strongSelf);
-            if (strongSelf.customViewHeight > 0) {
-                make.height.equalTo(@(strongSelf.customView.frame.size.height));
+        [self.customView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.messageView.mas_bottom);
+            make.left.right.equalTo(self);
+            if (self.customViewHeight > 0) {
+                make.height.equalTo(@(self.customView.frame.size.height));
             }
         }];
     }
@@ -330,8 +322,7 @@
         buttonViewHeight = self.alertButtonHeight;
         UIButton *button = self.buttons.firstObject;
         [button mas_makeConstraints:^(MASConstraintMaker *make) {
-            __strong typeof(self) strongSelf = weakSelf;
-            make.edges.equalTo(strongSelf.buttonsView);
+            make.edges.equalTo(self.buttonsView);
         }];
     } else if (self.buttons.count == 2) {
         buttonViewHeight = self.alertButtonHeight;
@@ -339,9 +330,8 @@
                                   withFixedSpacing:0
                                        leadSpacing:0
                                        tailSpacing:0];
-        [weakSelf.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
-            __strong typeof(self) strongSelf = weakSelf;
-            make.top.bottom.equalTo(strongSelf.buttonsView);
+        [self.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.bottom.equalTo(self.buttonsView);
         }];
     } else {
         buttonViewHeight = self.buttons.count * self.alertButtonHeight;
@@ -349,14 +339,12 @@
                                   withFixedSpacing:0
                                        leadSpacing:0
                                        tailSpacing:0];
-        [weakSelf.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
-            __strong typeof(self) strongSelf = weakSelf;
-            make.left.right.equalTo(strongSelf.buttonsView);
+        [self.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.right.equalTo(self.buttonsView);
         }];
     }
-    [weakSelf.buttonsView mas_makeConstraints:^(MASConstraintMaker *make) {
-        __strong typeof(self) strongSelf = weakSelf;
-        make.left.right.bottom.equalTo(strongSelf);
+    [self.buttonsView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.bottom.equalTo(self);
         make.height.equalTo(@(buttonViewHeight));
         make.top.equalTo(buttonTopView.mas_bottom);
     }];
@@ -364,7 +352,7 @@
 
 - (void)addSeperators {
     CGFloat onePixel = [YPAlertView onePixel];
-    __weak typeof(self) weakSelf = self;
+    
     for (UIButton *button in self.buttons) {
         UIView *line = [[UIView alloc] init];
         line.backgroundColor = self.separatorColor;
@@ -391,8 +379,7 @@
         line.backgroundColor = self.separatorColor;
         [self.titleView addSubview:line];
         [line mas_makeConstraints:^(MASConstraintMaker *make) {
-            __strong typeof(self) strongSelf = weakSelf;
-            make.left.bottom.right.equalTo(strongSelf.titleView);
+            make.left.bottom.right.equalTo(self.titleView);
             make.height.equalTo(@(onePixel));
         }];
     }
