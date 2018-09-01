@@ -1,7 +1,7 @@
 #YPAlertView.podspec
 Pod::Spec.new do |s|
 s.name         = "YPAlertView"
-s.version      = "1.0.1"
+s.version      = "1.0.2"
 s.summary      = "一个可高度自定义的alert view."
 
 s.homepage     = "https://github.com/yuping1989/YPAlertView"
