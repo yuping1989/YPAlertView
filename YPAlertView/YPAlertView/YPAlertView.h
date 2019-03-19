@@ -16,6 +16,7 @@
 @property (nonatomic, strong, readonly) UIImageView *titleBgImageView;
 @property (nonatomic, strong, readonly) UILabel *titleLabel;
 @property (nonatomic, strong, readonly) UILabel *messageLabel;
+@property (nonatomic, strong, readonly) UIButton *dismissButton;
 
 @property (nonatomic, strong, readonly) NSMutableArray <YPAlertButton *> *buttons;
 
@@ -36,6 +37,8 @@
 
 @property (nonatomic, strong) UIColor *separatorColor UI_APPEARANCE_SELECTOR;
 
+@property (nonatomic, assign) BOOL tapBgToDismiss UI_APPEARANCE_SELECTOR;
+
 @property (nonatomic, strong) UIView *customView;
 
 
@@ -52,9 +55,16 @@
             attributedMessage:(NSAttributedString *)message;
 
 - (void)addButton:(YPAlertButton *)button;
+- (void)addDefaultButtonWithTitle:(NSString *)title
+                          handler:(void (^)(YPAlertButton *button))handler;
+- (void)addDestructiveButtonWithTitle:(NSString *)title
+                          handler:(void (^)(YPAlertButton *button))handler;
+- (void)addCancelButtonWithTitle:(NSString *)title
+                          handler:(void (^)(YPAlertButton *button))handler;
 - (void)addButtonWithTitle:(NSString *)title
                      style:(YPAlertButtonStyle)style
                    handler:(void (^)(YPAlertButton *button))handler;
+
 
 - (void)setCustomView:(UIView *)view height:(CGFloat)height;
 

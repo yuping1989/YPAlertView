@@ -13,11 +13,11 @@
 
 @property (nonatomic, strong, readwrite) UIImageView *maskView;
 
-@property (nonatomic, strong, readwrite) UIView *titleView;
-@property (nonatomic, strong, readwrite) UIImageView *titleBgImageView;
+@property (nonatomic, strong, readwrite) UIImageView *titleView;
 @property (nonatomic, strong, readwrite) UILabel *titleLabel;
+@property (nonatomic, strong, readwrite) UIButton *dismissButton;
 
-@property (nonatomic, strong, readwrite) UIView *messageView;
+@property (nonatomic, strong, readwrite) UIImageView *messageView;
 @property (nonatomic, strong, readwrite) UILabel *messageLabel;
 
 @property (nonatomic, strong, readwrite) UIView *buttonsView;
@@ -82,6 +82,27 @@
     [self.buttonsView addSubview:button];
 }
 
+- (void)addDefaultButtonWithTitle:(NSString *)title
+                          handler:(void (^)(YPAlertButton *))handler {
+    [self addButtonWithTitle:title
+                       style:YPAlertButtonStyleDefault
+                     handler:handler];
+}
+
+- (void)addCancelButtonWithTitle:(NSString *)title
+                         handler:(void (^)(YPAlertButton *))handler {
+    [self addButtonWithTitle:title
+                       style:YPAlertButtonStyleCancel
+                     handler:handler];
+}
+
+- (void)addDestructiveButtonWithTitle:(NSString *)title
+                              handler:(void (^)(YPAlertButton *))handler {
+    [self addButtonWithTitle:title
+                       style:YPAlertButtonStyleDestructive
+                     handler:handler];
+}
+
 - (void)addButtonWithTitle:(NSString *)title
                      style:(YPAlertButtonStyle)style
                    handler:(void (^)(YPAlertButton *))handler {
@@ -130,7 +151,7 @@
 
 - (void)setTitleBgImage:(UIImage *)titleBgImage {
     _titleBgImage = titleBgImage;
-    self.titleBgImageView.image = titleBgImage;
+    self.titleView.image = titleBgImage;
 }
 
 - (void)setTitleBgColor:(UIColor *)titleBgColor {
@@ -211,6 +232,8 @@
     _messageColor = [[[self class] appearance] messageColor] ?: [UIColor blackColor];
     _messageFont = [[[self class] appearance] messageFont] ?: [UIFont systemFontOfSize:16];
     
+    _tapBgToDismiss = [[[self class] appearance] tapBgToDismiss];
+    
     [self initViews];
 }
 
@@ -223,14 +246,16 @@
     _maskView = [[UIImageView alloc] init];
     _maskView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5f];
     _maskView.userInteractionEnabled = YES;
+    UITapGestureRecognizer *gesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(maskViewTapped)];
+    [_maskView addGestureRecognizer:gesture];
     
     _titleView = [[UIImageView alloc] init];
     _titleView.backgroundColor = _titleBgColor;
+    _titleView.userInteractionEnabled = YES;
     [self addSubview:_titleView];
     
     if (_titleBgImage) {
-        _titleBgImageView = [[UIImageView alloc] initWithImage:_titleBgImage];
-        [_titleView addSubview:_titleBgImageView];
+        _titleView.image = _titleBgImage;
     }
     
     _titleLabel = [[UILabel alloc] init];
@@ -240,6 +265,7 @@
     [_titleView addSubview:_titleLabel];
     
     _messageView = [[UIImageView alloc] init];
+    _messageView.userInteractionEnabled = YES;
     [self addSubview:_messageView];
     
     _messageLabel = [[UILabel alloc] init];
@@ -252,12 +278,22 @@
     [self addSubview:_buttonsView];
 }
 
-- (UIImageView *)titleBgImageView {
-    if (!_titleBgImageView) {
-        _titleBgImageView = [[UIImageView alloc] init];
-        [_titleView insertSubview:_titleBgImageView atIndex:0];
+- (void)maskViewTapped {
+    if (self.tapBgToDismiss) {
+        [self dismiss];
     }
-    return _titleBgImageView;
+}
+
+- (UIButton *)dismissButton {
+    if (!_dismissButton) {
+        _dismissButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        _dismissButton.titleLabel.font = [UIFont systemFontOfSize:14];
+        _dismissButton.hidden = YES;
+        [_dismissButton addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
+        [_dismissButton setTitle:@"关闭" forState:UIControlStateNormal];
+        [_titleView addSubview:_dismissButton];
+    }
+    return _dismissButton;
 }
 
 - (void)layout {
@@ -276,12 +312,6 @@
         make.left.right.top.equalTo(self);
     }];
     
-    if (_titleBgImageView) {
-        [self.titleBgImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.edges.equalTo(self.titleView);
-        }];
-    }
-    
     [self.titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         UIEdgeInsets insets = UIEdgeInsetsZero;
         if (self.titleLabel.text) {
@@ -289,6 +319,13 @@
         }
         make.edges.equalTo(self.titleView).insets(insets);
     }];
+    
+    if (_dismissButton) {
+        [self.dismissButton mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.right.bottom.equalTo(self.titleView);
+            make.width.mas_equalTo(44);
+        }];
+    }
     
     [self.messageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.equalTo(self);
@@ -442,22 +479,18 @@
                       handler:(void (^)(BOOL))handler {
     YPAlertView *alert = [[YPAlertView alloc] initWithTitle:title message:message];
     if (cancelButtonTitle) {
-        [alert addButtonWithTitle:cancelButtonTitle
-                            style:YPAlertButtonStyleCancel
-                          handler:^(YPAlertButton *button) {
-                              if (handler) {
-                                  handler(NO);
-                              }
-                          }];
+        [alert addCancelButtonWithTitle:title handler:^(YPAlertButton *button) {
+            if (handler) {
+                handler(NO);
+            }
+        }];
     }
     if (okButtonTitle) {
-        [alert addButtonWithTitle:okButtonTitle
-                            style:YPAlertButtonStyleDestructive
-                          handler:^(YPAlertButton *button) {
-                              if (handler) {
-                                  handler(YES);
-                              }
-                          }];
+        [alert addDestructiveButtonWithTitle:okButtonTitle handler:^(YPAlertButton *button) {
+            if (handler) {
+                handler(YES);
+            }
+        }];
     }
     [alert show];
     return alert;
