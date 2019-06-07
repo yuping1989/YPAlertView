@@ -297,16 +297,14 @@
 }
 
 - (void)layout {
-    UIWindow *window = [UIApplication sharedApplication].windows.firstObject;
     [self.maskView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.top.right.bottom.equalTo(window);
+        make.left.top.right.bottom.equalTo(self.superview);
     }];
     
     [self mas_makeConstraints:^(MASConstraintMaker *make) {
         make.width.equalTo(@(self.alertViewWidth));
-        make.center.equalTo(window);
+        make.center.equalTo(self.superview);
     }];
-    
     
     [self.titleView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.top.equalTo(self);
