@@ -477,7 +477,7 @@
                       handler:(void (^)(BOOL))handler {
     YPAlertView *alert = [[YPAlertView alloc] initWithTitle:title message:message];
     if (cancelButtonTitle) {
-        [alert addCancelButtonWithTitle:title handler:^(YPAlertButton *button) {
+        [alert addCancelButtonWithTitle:cancelButtonTitle handler:^(YPAlertButton *button) {
             if (handler) {
                 handler(NO);
             }
