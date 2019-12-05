@@ -204,6 +204,9 @@
         _messageEdgeInsets = UIEdgeInsetsMake(20, 15, 20, 15);
     }
     
+    _buttonsEdgeInsets = [[[self class] appearance] buttonsEdgeInsets];
+    _buttonSpace = [[[self class] appearance] buttonSpace];
+    
     _alertViewWidth = [[[self class] appearance] alertViewWidth];
     if (_alertViewWidth == 0) {
         _alertViewWidth = 300;
@@ -219,10 +222,8 @@
         _alertCornerRadius = 10;
     }
     
-    _separatorColor = [[[self class] appearance] separatorColor];
-    if (!_separatorColor) {
-        _separatorColor = [UIColor colorWithRed:0.8f green:0.8f blue:0.8f alpha:1];
-    }
+    _separatorColor = [[[self class] appearance] separatorColor] ?: [UIColor colorWithRed:0.8f green:0.8f blue:0.8f alpha:1];
+    _titleSeparatorHeight = [[[self class] appearance] titleSeparatorHeight] ?: @([YPAlertView onePixel]);
     
     _titleBgImage = [[[self class] appearance] titleBgImage];
     _titleBgColor = [[[self class] appearance] titleBgColor] ?: [UIColor clearColor];
@@ -233,7 +234,8 @@
     _messageFont = [[[self class] appearance] messageFont] ?: [UIFont systemFontOfSize:16];
     
     _tapBgToDismiss = [[[self class] appearance] tapBgToDismiss];
-    
+    _dismissButtonAppear = [[[self class] appearance] dismissButtonAppear];
+
     [self initViews];
 }
 
@@ -318,7 +320,7 @@
         make.edges.equalTo(self.titleView).insets(insets);
     }];
     
-    if (_dismissButton) {
+    if (self.dismissButtonAppear) {
         [self.dismissButton mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.right.bottom.equalTo(self.titleView);
             make.width.mas_equalTo(44);
@@ -350,34 +352,54 @@
         }];
     }
     
-    CGFloat buttonViewHeight;
-    if (self.buttons.count == 0) {
-        buttonViewHeight = 0;
-    } else if (self.buttons.count == 1) {
-        buttonViewHeight = self.alertButtonHeight;
-        UIButton *button = self.buttons.firstObject;
-        [button mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.edges.equalTo(self.buttonsView);
-        }];
-    } else if (self.buttons.count == 2) {
-        buttonViewHeight = self.alertButtonHeight;
-        [self.buttons mas_distributeViewsAlongAxis:MASAxisTypeHorizontal
-                                  withFixedSpacing:0
-                                       leadSpacing:0
-                                       tailSpacing:0];
-        [self.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.top.bottom.equalTo(self.buttonsView);
-        }];
-    } else {
-        buttonViewHeight = self.buttons.count * self.alertButtonHeight;
-        [self.buttons mas_distributeViewsAlongAxis:MASAxisTypeVertical
-                                  withFixedSpacing:0
-                                       leadSpacing:0
-                                       tailSpacing:0];
-        [self.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.left.right.equalTo(self.buttonsView);
-        }];
+    CGFloat buttonViewHeight = 0;
+    if (self.style == YPAlertViewStyleSystem) {
+        if (self.buttons.count == 1) {
+            buttonViewHeight = self.alertButtonHeight;
+            UIButton *button = self.buttons.firstObject;
+            [button mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.edges.equalTo(self.buttonsView);
+            }];
+        } else if (self.buttons.count == 2) {
+            buttonViewHeight = self.alertButtonHeight;
+            [self.buttons mas_distributeViewsAlongAxis:MASAxisTypeHorizontal
+                                      withFixedSpacing:0
+                                           leadSpacing:0
+                                           tailSpacing:0];
+            [self.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.top.bottom.equalTo(self.buttonsView);
+            }];
+        } else {
+            buttonViewHeight = self.buttons.count * self.alertButtonHeight;
+            [self.buttons mas_distributeViewsAlongAxis:MASAxisTypeVertical
+                                      withFixedSpacing:0
+                                           leadSpacing:0
+                                           tailSpacing:0];
+            [self.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.left.right.equalTo(self.buttonsView);
+            }];
+        }
+    } else if (self.style == YPAlertViewStyleValue1) {
+        if (self.buttons.count == 1) {
+            buttonViewHeight = self.alertButtonHeight + self.buttonsEdgeInsets.top + self.buttonsEdgeInsets.bottom;
+            UIButton *button = self.buttons.firstObject;
+            [button mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.edges.equalTo(self.buttonsView).insets(self.buttonsEdgeInsets);
+                make.height.mas_equalTo(self.alertButtonHeight);
+            }];
+        } else {
+            buttonViewHeight = self.buttons.count * (self.alertButtonHeight + self.buttonSpace) + self.buttonSpace;
+            [self.buttons mas_distributeViewsAlongAxis:MASAxisTypeVertical
+                                      withFixedSpacing:self.buttonSpace
+                                           leadSpacing:self.buttonsEdgeInsets.top
+                                           tailSpacing:self.buttonsEdgeInsets.bottom];
+            [self.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.left.equalTo(self.buttonsView).offset(self.buttonsEdgeInsets.left);
+                make.right.equalTo(self.buttonsView).offset(-self.buttonsEdgeInsets.right);
+            }];
+        }
     }
+    
     [self.buttonsView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.bottom.equalTo(self);
         make.height.equalTo(@(buttonViewHeight));
@@ -388,34 +410,36 @@
 - (void)addSeperators {
     CGFloat onePixel = [YPAlertView onePixel];
     
-    for (UIButton *button in self.buttons) {
-        UIView *line = [[UIView alloc] init];
-        line.backgroundColor = self.separatorColor;
-        [button addSubview:line];
-        [line mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.left.top.right.equalTo(button);
-            make.height.equalTo(@(onePixel));
-        }];
+    if (self.style == YPAlertViewStyleSystem) {
+        for (UIButton *button in self.buttons) {
+            UIView *line = [[UIView alloc] init];
+            line.backgroundColor = self.separatorColor;
+            [button addSubview:line];
+            [line mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.left.top.right.equalTo(button);
+                make.height.equalTo(@(onePixel));
+            }];
+        }
+        
+        if (self.buttons.count == 2) {
+            UIButton *button = self.buttons.firstObject;
+            UIView *line = [[UIView alloc] init];
+            line.backgroundColor = self.separatorColor;
+            [button addSubview:line];
+            [line mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.top.right.bottom.equalTo(button);
+                make.width.equalTo(@(onePixel));
+            }];
+        }
     }
     
-    if (self.buttons.count == 2) {
-        UIButton *button = self.buttons.firstObject;
-        UIView *line = [[UIView alloc] init];
-        line.backgroundColor = self.separatorColor;
-        [button addSubview:line];
-        [line mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.top.right.bottom.equalTo(button);
-            make.width.equalTo(@(onePixel));
-        }];
-    }
-    
-    if (self.messageLabel.text) {
+    if (self.titleSeparatorHeight.floatValue > 0) {
         UIView *line = [[UIView alloc] init];
         line.backgroundColor = self.separatorColor;
         [self.titleView addSubview:line];
         [line mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.bottom.right.equalTo(self.titleView);
-            make.height.equalTo(@(onePixel));
+            make.height.equalTo(@(self.titleSeparatorHeight.floatValue));
         }];
     }
 }

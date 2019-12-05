@@ -9,6 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "YPAlertButton.h"
 
+typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
+    YPAlertViewStyleSystem,
+    YPAlertViewStyleValue1,
+};
+
 @interface YPAlertView : UIView
 
 @property (nonatomic, strong, readonly) UIImageView *maskView;
@@ -20,8 +25,13 @@
 
 @property (nonatomic, strong, readonly) NSMutableArray <YPAlertButton *> *buttons;
 
+@property (nonatomic, assign) YPAlertButtonStyle style;
+
 @property (nonatomic, assign) UIEdgeInsets titleEdgeInsets UI_APPEARANCE_SELECTOR;
 @property (nonatomic, assign) UIEdgeInsets messageEdgeInsets UI_APPEARANCE_SELECTOR;
+
+@property (nonatomic, assign) UIEdgeInsets buttonsEdgeInsets UI_APPEARANCE_SELECTOR;
+@property (nonatomic, assign) CGFloat buttonSpace UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic, assign) CGFloat alertViewWidth UI_APPEARANCE_SELECTOR;
 @property (nonatomic, assign) CGFloat alertButtonHeight UI_APPEARANCE_SELECTOR;
@@ -36,8 +46,11 @@
 @property (nonatomic, strong) UIFont *messageFont UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic, strong) UIColor *separatorColor UI_APPEARANCE_SELECTOR;
+@property (nonatomic, strong) NSNumber *titleSeparatorHeight UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic, assign) BOOL tapBgToDismiss UI_APPEARANCE_SELECTOR;
+
+@property (nonatomic, assign) BOOL dismissButtonAppear UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic, strong) UIView *customView;
 
@@ -64,7 +77,6 @@
 - (void)addButtonWithTitle:(NSString *)title
                      style:(YPAlertButtonStyle)style
                    handler:(void (^)(YPAlertButton *button))handler;
-
 
 - (void)setCustomView:(UIView *)view height:(CGFloat)height;
 

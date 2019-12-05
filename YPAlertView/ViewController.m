@@ -11,6 +11,8 @@
 
 @interface ViewController ()
 
+@property (nonatomic, weak) IBOutlet UISegmentedControl *styleSegmentedControl;
+
 @end
 
 @implementation ViewController
@@ -32,6 +34,7 @@
         
     }];
     alert.tapBgToDismiss = YES;
+    alert.style = self.styleSegmentedControl.selectedSegmentIndex;
     [alert addButton:cancelButton];
     [alert show];
 }
@@ -42,7 +45,7 @@
         
     }];
     alert.titleBgColor = [UIColor lightGrayColor];
-    alert.dismissButton.hidden = NO;
+    alert.style = self.styleSegmentedControl.selectedSegmentIndex;
     [alert addButton:cancelButton];
     [alert show];
 }
@@ -53,6 +56,15 @@
         
     }];
     [alert addButton:cancelButton];
+    
+    alert.style = self.styleSegmentedControl.selectedSegmentIndex;
+    
+    alert.buttonSpace = 8;
+    alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
+    for (YPAlertButton *button in alert.buttons) {
+        button.backgroundColor = [UIColor lightGrayColor];
+    }
+    alert.tapBgToDismiss = YES;
     [alert show];
 }
 
@@ -66,6 +78,14 @@
     }];
     [alert addButton:cancelButton];
     [alert addButton:okButton];
+    
+    alert.buttonSpace = 8;
+    alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
+    for (YPAlertButton *button in alert.buttons) {
+        button.backgroundColor = [UIColor lightGrayColor];
+    }
+    
+    alert.style = self.styleSegmentedControl.selectedSegmentIndex;
     [alert show];
 }
 
@@ -86,6 +106,16 @@
     [alert addButton:okButton];
     [alert addButton:otherButton];
     [alert addButton:cancelButton];
+    
+    for (YPAlertButton *button in alert.buttons) {
+        button.backgroundColor = [UIColor lightGrayColor];
+    }
+    alert.buttonSpace = 8;
+    alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
+    
+    alert.dismissButtonAppear = YES;
+    alert.style = self.styleSegmentedControl.selectedSegmentIndex;
+    
     [alert show];
 }
 
