@@ -9,6 +9,13 @@
 #import "YPAlertView.h"
 #import <Masonry/Masonry.h>
 
+#define iPhoneXSeries \
+({BOOL isIPhoneX = NO;\
+if (@available(iOS 11.0, *)) {\
+isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.bottom > 0.0;\
+}\
+(isIPhoneX);})
+
 @interface YPAlertView ()
 
 @property (nonatomic, strong, readwrite) UIImageView *maskView;
@@ -121,13 +128,26 @@
     [self layout];
     [self addSeperators];
     
-    self.maskView.alpha = 0;
-    self.alpha = 0;
-    [UIView animateWithDuration:0.25f
-                     animations:^{
-                         self.maskView.alpha = 0.5f;
-                         self.alpha = 1;
-                     }];
+    if (self.style == YPAlertViewStyleActionSheet) {
+        self.maskView.alpha = 0;
+        [self.superview layoutIfNeeded];
+        
+        [self mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.left.right.equalTo(self.superview);
+            make.bottom.equalTo(self.superview);
+        }];
+        [UIView animateWithDuration:0.25f animations:^{
+            [self.superview layoutIfNeeded];
+            self.maskView.alpha = 0.5f;
+        }];
+    } else {
+        self.maskView.alpha = 0;
+        self.alpha = 0;
+        [UIView animateWithDuration:0.25f animations:^{
+            self.maskView.alpha = 0.5f;
+            self.alpha = 1;
+        }];
+    }
 }
 
 - (void)dismiss {
@@ -135,18 +155,27 @@
 }
 
 - (void)dismissWithCompletion:(void (^)(void))completion {
-    [UIView animateWithDuration:0.25f
-                     animations:^{
-                         self.maskView.alpha = 0;
-                         self.alpha = 0;
-                     }
-                     completion:^(BOOL finished) {
-                         [self.maskView removeFromSuperview];
-                         [self removeFromSuperview];
-                         if (completion) {
-                             completion();
-                         }
-                     }];
+    
+    if (self.style == YPAlertViewStyleActionSheet) {
+        [self mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.left.right.equalTo(self.superview);
+            make.top.equalTo(self.superview.mas_bottom);
+        }];
+    }
+    [UIView animateWithDuration:0.25f animations:^{
+        self.maskView.alpha = 0;
+        if (self.style == YPAlertViewStyleActionSheet) {
+            [self.superview layoutIfNeeded];
+        } else {
+            self.alpha = 0;
+        }
+    } completion:^(BOOL finished) {
+        [self.maskView removeFromSuperview];
+        [self removeFromSuperview];
+        if (completion) {
+            completion();
+        }
+    }];
 }
 
 - (void)setTitleBgImage:(UIImage *)titleBgImage {
@@ -206,6 +235,10 @@
     
     _buttonsEdgeInsets = [[[self class] appearance] buttonsEdgeInsets];
     _buttonSpace = [[[self class] appearance] buttonSpace];
+    _buttonCornerRadius = [[[self class] appearance] buttonCornerRadius];
+    if (_buttonCornerRadius == 0) {
+        _buttonCornerRadius = 5;
+    }
     
     _alertViewWidth = [[[self class] appearance] alertViewWidth];
     if (_alertViewWidth == 0) {
@@ -304,8 +337,13 @@
     }];
     
     [self mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.width.equalTo(@(self.alertViewWidth));
-        make.center.equalTo(self.superview);
+        if (self.style == YPAlertViewStyleActionSheet) {
+            make.left.right.equalTo(self.superview);
+            make.top.equalTo(self.superview.mas_bottom);
+        } else {
+            make.width.equalTo(@(self.alertViewWidth));
+            make.center.equalTo(self.superview);
+        }
     }];
     
     [self.titleView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -347,7 +385,7 @@
             make.top.equalTo(self.messageView.mas_bottom);
             make.left.right.equalTo(self);
             if (self.customViewHeight > 0) {
-                make.height.equalTo(@(self.customView.frame.size.height));
+                make.height.mas_equalTo(self.customViewHeight);
             }
         }];
     }
@@ -379,7 +417,7 @@
                 make.left.right.equalTo(self.buttonsView);
             }];
         }
-    } else if (self.style == YPAlertViewStyleValue1) {
+    } else if (self.style == YPAlertViewStyleCornerButton) {
         if (self.buttons.count == 1) {
             buttonViewHeight = self.alertButtonHeight + self.buttonsEdgeInsets.top + self.buttonsEdgeInsets.bottom;
             UIButton *button = self.buttons.firstObject;
@@ -398,10 +436,55 @@
                 make.right.equalTo(self.buttonsView).offset(-self.buttonsEdgeInsets.right);
             }];
         }
+        for (YPAlertButton *button in self.buttons) {
+            button.layer.cornerRadius = self.buttonCornerRadius;
+        }
+    } else if (self.style == YPAlertViewStyleActionSheet) {
+        if (self.buttons.count == 1) {
+            buttonViewHeight = self.alertButtonHeight;
+            UIButton *button = self.buttons.firstObject;
+            [button mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.edges.equalTo(self.buttonsView);
+                make.height.mas_equalTo(self.alertButtonHeight);
+            }];
+        } else {
+            YPAlertButton *lastButton = [self.buttons lastObject];
+            CGFloat space = 0;
+            if (lastButton.style == YPAlertButtonStyleCancel) {
+                space = 8;
+            }
+            
+            buttonViewHeight = self.buttons.count * self.alertButtonHeight;
+            
+            YPAlertButton *topButton;
+            for (int i = 0; i < self.buttons.count; i++) {
+                YPAlertButton *button = self.buttons[i];
+                [button mas_makeConstraints:^(MASConstraintMaker *make) {
+                    make.left.right.equalTo(self.buttonsView);
+                    make.height.mas_equalTo(self.alertButtonHeight);
+                    
+                    if (i == 0) {
+                        make.top.equalTo(self.buttonsView);
+                    } else {
+                        if (i == self.buttons.count - 1) {
+                            make.top.equalTo(topButton.mas_bottom).offset(8);
+                            make.bottom.equalTo(self.buttonsView);
+                        } else {
+                            make.top.equalTo(topButton.mas_bottom);
+                        }
+                    }
+                }];
+                topButton = button;
+            }
+        }
     }
-    
+    CGFloat bottom = 0;
+    if (self.style == YPAlertViewStyleActionSheet && iPhoneXSeries) {
+        bottom = -34;
+    }
     [self.buttonsView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.bottom.equalTo(self);
+        make.left.right.equalTo(self);
+        make.bottom.equalTo(self).offset(bottom);
         make.height.equalTo(@(buttonViewHeight));
         make.top.equalTo(buttonTopView.mas_bottom);
     }];
@@ -411,24 +494,33 @@
     CGFloat onePixel = [YPAlertView onePixel];
     
     if (self.style == YPAlertViewStyleSystem) {
-        for (UIButton *button in self.buttons) {
-            UIView *line = [[UIView alloc] init];
-            line.backgroundColor = self.separatorColor;
-            [button addSubview:line];
-            [line mas_makeConstraints:^(MASConstraintMaker *make) {
+        for (YPAlertButton *button in self.buttons) {
+            [self addLineInView:button layout:^(MASConstraintMaker *make) {
                 make.left.top.right.equalTo(button);
                 make.height.equalTo(@(onePixel));
             }];
         }
         
         if (self.buttons.count == 2) {
-            UIButton *button = self.buttons.firstObject;
-            UIView *line = [[UIView alloc] init];
-            line.backgroundColor = self.separatorColor;
-            [button addSubview:line];
-            [line mas_makeConstraints:^(MASConstraintMaker *make) {
+            YPAlertButton *button = self.buttons.firstObject;
+            [self addLineInView:button layout:^(MASConstraintMaker *make) {
                 make.top.right.bottom.equalTo(button);
                 make.width.equalTo(@(onePixel));
+            }];
+        }
+    } else if (self.style == YPAlertViewStyleActionSheet) {
+        for (YPAlertButton *button in self.buttons) {
+            [self addLineInView:button layout:^(MASConstraintMaker *make) {
+                make.left.top.right.equalTo(button);
+                make.height.equalTo(@(onePixel));
+            }];
+        }
+        if (iPhoneXSeries) {
+            YPAlertButton *button = [self.buttons lastObject];
+            [self addLineInView:self layout:^(MASConstraintMaker *make) {
+                make.left.right.equalTo(button);
+                make.top.equalTo(button.mas_bottom);
+                make.height.equalTo(@(onePixel));
             }];
         }
     }
@@ -442,6 +534,13 @@
             make.height.equalTo(@(self.titleSeparatorHeight.floatValue));
         }];
     }
+}
+
+- (void)addLineInView:(UIView *)view layout:(void(NS_NOESCAPE ^)(MASConstraintMaker *make))block {
+    UIView *line = [[UIView alloc] init];
+    line.backgroundColor = self.separatorColor;
+    [view addSubview:line];
+    [line mas_makeConstraints:block];
 }
 
 - (void)buttonClicked:(YPAlertButton *)button {

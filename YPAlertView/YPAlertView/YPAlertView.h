@@ -11,7 +11,8 @@
 
 typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
     YPAlertViewStyleSystem,
-    YPAlertViewStyleValue1,
+    YPAlertViewStyleCornerButton,
+    YPAlertViewStyleActionSheet,
 };
 
 @interface YPAlertView : UIView
@@ -30,8 +31,10 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 @property (nonatomic, assign) UIEdgeInsets titleEdgeInsets UI_APPEARANCE_SELECTOR;
 @property (nonatomic, assign) UIEdgeInsets messageEdgeInsets UI_APPEARANCE_SELECTOR;
 
+// 以下3个属性仅在style == YPAlertViewStyleCornerButtons时生效
 @property (nonatomic, assign) UIEdgeInsets buttonsEdgeInsets UI_APPEARANCE_SELECTOR;
 @property (nonatomic, assign) CGFloat buttonSpace UI_APPEARANCE_SELECTOR;
+@property (nonatomic, assign) CGFloat buttonCornerRadius UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic, assign) CGFloat alertViewWidth UI_APPEARANCE_SELECTOR;
 @property (nonatomic, assign) CGFloat alertButtonHeight UI_APPEARANCE_SELECTOR;

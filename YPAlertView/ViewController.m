@@ -76,14 +76,13 @@
     YPAlertButton *okButton = [YPAlertButton buttonWithTitle:@"确定" style:YPAlertButtonStyleDestructive handler:^(YPAlertButton *button) {
         
     }];
+//    okButton.backgroundColor = [UIColor lightGrayColor];
     [alert addButton:cancelButton];
     [alert addButton:okButton];
     
     alert.buttonSpace = 8;
     alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
-    for (YPAlertButton *button in alert.buttons) {
-        button.backgroundColor = [UIColor lightGrayColor];
-    }
+    alert.buttonCornerRadius = 5;
     
     alert.style = self.styleSegmentedControl.selectedSegmentIndex;
     [alert show];
