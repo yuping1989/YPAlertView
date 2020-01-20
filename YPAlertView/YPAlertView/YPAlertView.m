@@ -178,6 +178,14 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     }];
 }
 
+- (void)setStyle:(YPAlertViewStyle)style {
+    _style = style;
+    if (style == YPAlertViewStyleActionSheet) {
+        self.tapBgToDismiss = YES;
+        self.layer.cornerRadius = 0;
+    }
+}
+
 - (void)setTitleBgImage:(UIImage *)titleBgImage {
     _titleBgImage = titleBgImage;
     self.titleView.image = titleBgImage;
@@ -235,10 +243,6 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     
     _buttonsEdgeInsets = [[[self class] appearance] buttonsEdgeInsets];
     _buttonSpace = [[[self class] appearance] buttonSpace];
-    _buttonCornerRadius = [[[self class] appearance] buttonCornerRadius];
-    if (_buttonCornerRadius == 0) {
-        _buttonCornerRadius = 5;
-    }
     
     _alertViewWidth = [[[self class] appearance] alertViewWidth];
     if (_alertViewWidth == 0) {
@@ -255,7 +259,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
         _alertCornerRadius = 10;
     }
     
-    _separatorColor = [[[self class] appearance] separatorColor] ?: [UIColor colorWithRed:0.8f green:0.8f blue:0.8f alpha:1];
+    _separatorColor = [[[self class] appearance] separatorColor] ?: [UIColor colorWithWhite:0.85f alpha:1.0f];
     _titleSeparatorHeight = [[[self class] appearance] titleSeparatorHeight] ?: @([YPAlertView onePixel]);
     
     _titleBgImage = [[[self class] appearance] titleBgImage];
@@ -390,103 +394,53 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
         }];
     }
     
-    CGFloat buttonViewHeight = 0;
-    if (self.style == YPAlertViewStyleSystem) {
-        if (self.buttons.count == 1) {
-            buttonViewHeight = self.alertButtonHeight;
-            UIButton *button = self.buttons.firstObject;
+    if (self.style == YPAlertViewStyleSystem && self.buttons.count == 2) {
+        [self.buttons mas_distributeViewsAlongAxis:MASAxisTypeHorizontal
+                                  withFixedSpacing:0
+                                       leadSpacing:0
+                                       tailSpacing:0];
+        [self.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.bottom.equalTo(self.buttonsView);
+            make.height.mas_equalTo(self.alertButtonHeight);
+        }];
+    } else {
+        YPAlertButton *topButton;
+        for (int i = 0; i < self.buttons.count; i++) {
+            YPAlertButton *button = self.buttons[i];
             [button mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.edges.equalTo(self.buttonsView);
-            }];
-        } else if (self.buttons.count == 2) {
-            buttonViewHeight = self.alertButtonHeight;
-            [self.buttons mas_distributeViewsAlongAxis:MASAxisTypeHorizontal
-                                      withFixedSpacing:0
-                                           leadSpacing:0
-                                           tailSpacing:0];
-            [self.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.top.bottom.equalTo(self.buttonsView);
-            }];
-        } else {
-            buttonViewHeight = self.buttons.count * self.alertButtonHeight;
-            [self.buttons mas_distributeViewsAlongAxis:MASAxisTypeVertical
-                                      withFixedSpacing:0
-                                           leadSpacing:0
-                                           tailSpacing:0];
-            [self.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
                 make.left.right.equalTo(self.buttonsView);
-            }];
-        }
-    } else if (self.style == YPAlertViewStyleCornerButton) {
-        if (self.buttons.count == 1) {
-            buttonViewHeight = self.alertButtonHeight + self.buttonsEdgeInsets.top + self.buttonsEdgeInsets.bottom;
-            UIButton *button = self.buttons.firstObject;
-            [button mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.edges.equalTo(self.buttonsView).insets(self.buttonsEdgeInsets);
                 make.height.mas_equalTo(self.alertButtonHeight);
-            }];
-        } else {
-            buttonViewHeight = self.buttons.count * (self.alertButtonHeight + self.buttonSpace) + self.buttonSpace;
-            [self.buttons mas_distributeViewsAlongAxis:MASAxisTypeVertical
-                                      withFixedSpacing:self.buttonSpace
-                                           leadSpacing:self.buttonsEdgeInsets.top
-                                           tailSpacing:self.buttonsEdgeInsets.bottom];
-            [self.buttons mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(self.buttonsView).offset(self.buttonsEdgeInsets.left);
-                make.right.equalTo(self.buttonsView).offset(-self.buttonsEdgeInsets.right);
-            }];
-        }
-        for (YPAlertButton *button in self.buttons) {
-            button.layer.cornerRadius = self.buttonCornerRadius;
-        }
-    } else if (self.style == YPAlertViewStyleActionSheet) {
-        if (self.buttons.count == 1) {
-            buttonViewHeight = self.alertButtonHeight;
-            UIButton *button = self.buttons.firstObject;
-            [button mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.edges.equalTo(self.buttonsView);
-                make.height.mas_equalTo(self.alertButtonHeight);
-            }];
-        } else {
-            YPAlertButton *lastButton = [self.buttons lastObject];
-            CGFloat space = 0;
-            if (lastButton.style == YPAlertButtonStyleCancel) {
-                space = 8;
-            }
-            
-            buttonViewHeight = self.buttons.count * self.alertButtonHeight;
-            
-            YPAlertButton *topButton;
-            for (int i = 0; i < self.buttons.count; i++) {
-                YPAlertButton *button = self.buttons[i];
-                [button mas_makeConstraints:^(MASConstraintMaker *make) {
-                    make.left.right.equalTo(self.buttonsView);
-                    make.height.mas_equalTo(self.alertButtonHeight);
-                    
-                    if (i == 0) {
-                        make.top.equalTo(self.buttonsView);
-                    } else {
-                        if (i == self.buttons.count - 1) {
-                            make.top.equalTo(topButton.mas_bottom).offset(8);
-                            make.bottom.equalTo(self.buttonsView);
+                if (i == 0) {
+                    make.top.equalTo(self.buttonsView);
+                } else {
+                    if (i == self.buttons.count - 1) {
+                        make.bottom.equalTo(self.buttonsView);
+                        if (self.style == YPAlertViewStyleActionSheet) {
+                            make.top.equalTo(topButton.mas_bottom).offset(self.buttonSpace);
                         } else {
-                            make.top.equalTo(topButton.mas_bottom);
+                           make.top.equalTo(topButton.mas_bottom).offset(self.style == YPAlertViewStyleCornerButton ? self.buttonSpace : 0);
                         }
+                    } else {
+                        make.top.equalTo(topButton.mas_bottom).offset(self.style == YPAlertViewStyleCornerButton ? self.buttonSpace : 0);
                     }
-                }];
-                topButton = button;
-            }
+                }
+                if (self.buttons.count == 1) {
+                    make.bottom.equalTo(self.buttonsView);
+                }
+            }];
+            topButton = button;
         }
     }
+    
     CGFloat bottom = 0;
     if (self.style == YPAlertViewStyleActionSheet && iPhoneXSeries) {
         bottom = -34;
     }
     [self.buttonsView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.equalTo(self);
-        make.bottom.equalTo(self).offset(bottom);
-        make.height.equalTo(@(buttonViewHeight));
-        make.top.equalTo(buttonTopView.mas_bottom);
+        make.left.equalTo(self).offset(self.buttonsEdgeInsets.left);
+        make.top.equalTo(buttonTopView.mas_bottom).offset(self.buttonsEdgeInsets.top);
+        make.right.equalTo(self).offset(-self.buttonsEdgeInsets.right);
+        make.bottom.equalTo(self).offset(bottom - self.buttonsEdgeInsets.bottom);
     }];
 }
 
@@ -509,7 +463,21 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
             }];
         }
     } else if (self.style == YPAlertViewStyleActionSheet) {
-        for (YPAlertButton *button in self.buttons) {
+        for (int i = 0; i < self.buttons.count; i++) {
+            YPAlertButton *button = self.buttons[i];
+            if (i == self.buttons.count - 1) {
+                if (button.style == YPAlertButtonStyleCancel && self.buttons.count > 1) {
+                    UIView *line = [[UIView alloc] init];
+                    line.backgroundColor = [UIColor colorWithWhite:0.95f alpha:1.0f];
+                    [self.buttonsView addSubview:line];
+                    [line mas_makeConstraints:^(MASConstraintMaker *make) {
+                        make.left.right.equalTo(button);
+                        make.height.mas_equalTo(self.buttonSpace);
+                        make.bottom.equalTo(button.mas_top);
+                    }];
+                    break;
+                }
+            }
             [self addLineInView:button layout:^(MASConstraintMaker *make) {
                 make.left.top.right.equalTo(button);
                 make.height.equalTo(@(onePixel));
@@ -517,7 +485,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
         }
         if (iPhoneXSeries) {
             YPAlertButton *button = [self.buttons lastObject];
-            [self addLineInView:self layout:^(MASConstraintMaker *make) {
+            [self addLineInView:self.buttonsView layout:^(MASConstraintMaker *make) {
                 make.left.right.equalTo(button);
                 make.top.equalTo(button.mas_bottom);
                 make.height.equalTo(@(onePixel));

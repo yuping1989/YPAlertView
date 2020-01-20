@@ -35,7 +35,17 @@
     }];
     alert.tapBgToDismiss = YES;
     alert.style = self.styleSegmentedControl.selectedSegmentIndex;
+    
     [alert addButton:cancelButton];
+    
+    if (alert.style == YPAlertViewStyleCornerButton) {
+        for (YPAlertButton *button in alert.buttons) {
+            button.backgroundColor = [UIColor lightGrayColor];
+        }
+        alert.buttonSpace = 8;
+        alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
+    }
+    
     [alert show];
 }
 
@@ -46,7 +56,17 @@
     }];
     alert.titleBgColor = [UIColor lightGrayColor];
     alert.style = self.styleSegmentedControl.selectedSegmentIndex;
+    
     [alert addButton:cancelButton];
+    
+    if (alert.style == YPAlertViewStyleCornerButton) {
+        for (YPAlertButton *button in alert.buttons) {
+            button.backgroundColor = [UIColor lightGrayColor];
+        }
+        alert.buttonSpace = 8;
+        alert.buttonsEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
+    }
+    
     [alert show];
 }
 
@@ -59,10 +79,12 @@
     
     alert.style = self.styleSegmentedControl.selectedSegmentIndex;
     
-    alert.buttonSpace = 8;
-    alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
-    for (YPAlertButton *button in alert.buttons) {
-        button.backgroundColor = [UIColor lightGrayColor];
+    if (alert.style == YPAlertViewStyleCornerButton) {
+        for (YPAlertButton *button in alert.buttons) {
+            button.backgroundColor = [UIColor lightGrayColor];
+        }
+        alert.buttonSpace = 8;
+        alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
     }
     alert.tapBgToDismiss = YES;
     [alert show];
@@ -76,15 +98,19 @@
     YPAlertButton *okButton = [YPAlertButton buttonWithTitle:@"确定" style:YPAlertButtonStyleDestructive handler:^(YPAlertButton *button) {
         
     }];
-//    okButton.backgroundColor = [UIColor lightGrayColor];
     [alert addButton:cancelButton];
     [alert addButton:okButton];
     
-    alert.buttonSpace = 8;
-    alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
-    alert.buttonCornerRadius = 5;
-    
     alert.style = self.styleSegmentedControl.selectedSegmentIndex;
+    if (alert.style == YPAlertViewStyleCornerButton) {
+        for (YPAlertButton *button in alert.buttons) {
+            button.backgroundColor = [UIColor lightGrayColor];
+        }
+        alert.buttonSpace = 8;
+        alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
+    } else if (alert.style == YPAlertViewStyleActionSheet) {
+        alert.buttonSpace = 8;
+    }
     [alert show];
 }
 
@@ -106,14 +132,18 @@
     [alert addButton:otherButton];
     [alert addButton:cancelButton];
     
-    for (YPAlertButton *button in alert.buttons) {
-        button.backgroundColor = [UIColor lightGrayColor];
-    }
-    alert.buttonSpace = 8;
-    alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
-    
     alert.dismissButtonAppear = YES;
     alert.style = self.styleSegmentedControl.selectedSegmentIndex;
+    
+    if (alert.style == YPAlertViewStyleCornerButton) {
+        for (YPAlertButton *button in alert.buttons) {
+            button.backgroundColor = [UIColor lightGrayColor];
+        }
+        alert.buttonSpace = 8;
+        alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
+    } else if (alert.style == YPAlertViewStyleActionSheet) {
+        alert.buttonSpace = 8;
+    }
     
     [alert show];
 }
