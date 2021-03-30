@@ -31,12 +31,13 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 @property (nonatomic, assign) UIEdgeInsets titleEdgeInsets UI_APPEARANCE_SELECTOR;
 @property (nonatomic, assign) UIEdgeInsets messageEdgeInsets UI_APPEARANCE_SELECTOR;
 
-// 以下3个属性仅在style == YPAlertViewStyleCornerButtons时生效
-@property (nonatomic, assign) UIEdgeInsets buttonsEdgeInsets UI_APPEARANCE_SELECTOR;
+// 以下2个属性仅在style == YPAlertViewStyleCornerButton时生效
+@property (nonatomic, assign) UIEdgeInsets buttonEdgeInsets UI_APPEARANCE_SELECTOR;
 @property (nonatomic, assign) CGFloat buttonSpace UI_APPEARANCE_SELECTOR;
 
+@property (nonatomic, assign) BOOL buttonVertical UI_APPEARANCE_SELECTOR;
+
 @property (nonatomic, assign) CGFloat alertViewWidth UI_APPEARANCE_SELECTOR;
-@property (nonatomic, assign) CGFloat alertButtonHeight UI_APPEARANCE_SELECTOR;
 @property (nonatomic, assign) CGFloat alertCornerRadius UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic, strong) UIImage *titleBgImage UI_APPEARANCE_SELECTOR;
@@ -52,7 +53,7 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 
 @property (nonatomic, assign) BOOL tapBgToDismiss UI_APPEARANCE_SELECTOR;
 
-@property (nonatomic, assign) BOOL dismissButtonAppear UI_APPEARANCE_SELECTOR;
+@property (nonatomic, assign) BOOL showDismissButton UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic, strong) UIView *customView;
 
@@ -69,16 +70,20 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 - (instancetype)initWithTitle:(NSString *)title
             attributedMessage:(NSAttributedString *)message;
 
+- (void)setButtonHeight:(CGFloat)height style:(YPAlertViewStyle)style UI_APPEARANCE_SELECTOR;
+
 - (void)addButton:(YPAlertButton *)button;
 - (void)addDefaultButtonWithTitle:(NSString *)title
-                          handler:(void (^)(YPAlertButton *button))handler;
+                        onPressed:(void (^)(void))onPressed;
 - (void)addDestructiveButtonWithTitle:(NSString *)title
-                          handler:(void (^)(YPAlertButton *button))handler;
+                            onPressed:(void (^)(void))onPressed;
 - (void)addCancelButtonWithTitle:(NSString *)title
-                          handler:(void (^)(YPAlertButton *button))handler;
+                       onPressed:(void (^)(void))onPressed;
+- (void)addFocusButtonWithTitle:(NSString *)title
+                      onPressed:(void (^)(void))onPressed;
 - (void)addButtonWithTitle:(NSString *)title
                      style:(YPAlertButtonStyle)style
-                   handler:(void (^)(YPAlertButton *button))handler;
+                 onPressed:(void (^)(void))onPressed;
 
 - (void)setCustomView:(UIView *)view height:(CGFloat)height;
 
@@ -90,8 +95,12 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 
 @end
 
+
+YPAlertView * YPAlert(void);
+
 @interface YPAlertView (Add)
 
+/// 以下4个快速方法将废弃
 + (instancetype)showWithTitle:(NSString *)title;
 
 + (instancetype)showWithTitle:(NSString *)title
@@ -106,6 +115,52 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
                       message:(NSString *)message
             cancelButtonTitle:(NSString *)cancelButtonTitle
                 okButtonTitle:(NSString *)okButtonTitle
-                      handler:(void (^)(BOOL isOkButton))handler;
+                      onPressed:(void (^)(BOOL isOkButton))onPressed;
+
+/// 以下是采用链式语法进行Alert的初始化
+- (YPAlertView *(^)(NSString *title))s_title;
+- (YPAlertView *(^)(NSString *message))s_message;
+
+- (YPAlertView *(^)(NSString *title, void (^)(NSMutableAttributedString *attr)))s_attributedTitle;
+- (YPAlertView *(^)(NSString *message, void (^)(NSMutableAttributedString *attr)))s_attributedMessage;
+
+- (YPAlertView *(^)(YPAlertViewStyle style))s_style;
+
+- (YPAlertView *(^)(UIEdgeInsets insets))s_titleEdgeInsets;
+- (YPAlertView *(^)(UIEdgeInsets insets))s_messageEdgeInsets;
+
+- (YPAlertView *(^)(UIEdgeInsets insets))s_buttonEdgeInsets;
+- (YPAlertView *(^)(CGFloat num))s_buttonSpace;
+
+- (YPAlertView *(^)(BOOL b))s_buttonVertical;
+
+- (YPAlertView *(^)(CGFloat num))s_alertViewWidth;
+
+- (YPAlertView *(^)(CGFloat num))s_alertCornerRadius;
+
+- (YPAlertView *(^)(UIImage *image))s_titleBgImage;
+- (YPAlertView *(^)(UIColor *color))s_titleBgColor;
+- (YPAlertView *(^)(UIColor *color))s_titleColor;
+- (YPAlertView *(^)(UIFont *font))s_titleFont;
+
+- (YPAlertView *(^)(UIColor *color))s_messageColor;
+- (YPAlertView *(^)(UIFont *font))s_messageFont;
+
+- (YPAlertView *(^)(UIColor *color))s_separatorColor;
+- (YPAlertView *(^)(NSNumber *num))s_titleSeparatorHeight;
+
+- (YPAlertView *(^)(BOOL b))s_tapBgToDismiss;
+- (YPAlertView *(^)(BOOL b))s_showDismissButton;
+
+- (YPAlertView *(^)(UIView *view))s_customView;
+
+- (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))s_addDefaultButton;
+- (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))s_addCancelButton;
+- (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))s_addDestructiveButton;
+- (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))s_addFocusButton;
+- (YPAlertView *(^)(NSString *title, YPAlertButtonStyle style, void (^onPressed)(void)))s_addButton;
+
+- (YPAlertView *(^)(void))s_show;
+- (YPAlertView *(^)(UIView *view))s_showInView;
 
 @end

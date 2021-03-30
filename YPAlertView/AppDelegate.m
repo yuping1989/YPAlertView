@@ -19,7 +19,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
-    [[YPAlertButton appearance] setDestructiveTitleFont:[UIFont boldSystemFontOfSize:17]];
+//    [YPAlertButton appearance].destructiveTitleFont = [UIFont boldSystemFontOfSize:18];
+    
     return YES;
 }
 

@@ -10,59 +10,68 @@
 
 @interface YPAlertButton ()
 
-
+@property (nonatomic, strong) NSMutableDictionary *colorDict;
+@property (nonatomic, strong) NSMutableDictionary *fontDict;
 
 @end
 
 @implementation YPAlertButton
 
-+ (instancetype)buttonWithTitle:(NSString *)title style:(YPAlertButtonStyle)style handler:(void (^)(YPAlertButton *))handler {
++ (instancetype)buttonWithTitle:(NSString *)title style:(YPAlertButtonStyle)style onPressed:(void (^)(void))onPressed {
     YPAlertButton *button = [YPAlertButton buttonWithType:UIButtonTypeSystem];
     [button setTitle:title forState:UIControlStateNormal];
     button.style = style;
-    button.handler = handler;
+    button.onPressed = onPressed;
     return button;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _defaultBgColor = [[[self class] appearance] defaultBgColor] ?: [UIColor clearColor];
-        _defaultTitleColor = [[[self class] appearance] defaultTitleColor] ?: [UIColor blackColor];
-        _defaultTitleFont = [[[self class] appearance] defaultTitleFont] ?: [UIFont systemFontOfSize:17];
-        _cancelBgColor = [[[self class] appearance] cancelBgColor] ?: [UIColor clearColor];
-        _cancelTitleColor = [[[self class] appearance] cancelTitleColor] ?: [UIColor blackColor];
-        _cancelTitleFont = [[[self class] appearance] cancelTitleFont] ?: [UIFont systemFontOfSize:17];
-        _destructiveBgColor = [[[self class] appearance] destructiveBgColor] ?: [UIColor clearColor];
-        _destructiveTitleColor = [[[self class] appearance] destructiveTitleColor] ?: [UIColor blackColor];
-        _destructiveTitleFont = [[[self class] appearance] destructiveTitleFont] ?: [UIFont systemFontOfSize:17];
-        
-        _autoDismiss = YES;
-        self.style = YPAlertButtonStyleDefault;
+        [self _setup];
     }
     return self;
 }
 
-
-- (void)setStyle:(YPAlertButtonStyle)style {
-    _style = style;
+- (void)_setup {
+    _colorDict = [NSMutableDictionary dictionaryWithDictionary:
+                  @{@(YPAlertButtonStyleDefault) : [UIColor systemBlueColor],
+                    @(YPAlertButtonStyleCancel) : [UIColor darkGrayColor],
+                    @(YPAlertButtonStyleDestructive) : [UIColor colorWithRed:244 / 255.0f green:67 / 255.0f blue:54 / 255.0f alpha:1.0f],
+                    @(YPAlertButtonStyleFocus) : [UIColor systemBlueColor],
+                  }];
     
-    switch (style) {
-        case YPAlertButtonStyleDefault:
-            self.backgroundColor = self.defaultBgColor;
-            self.titleLabel.font = self.defaultTitleFont;
-            [self setTitleColor:self.defaultTitleColor forState:UIControlStateNormal];
-            break;
-        case YPAlertButtonStyleCancel:
-            self.backgroundColor = self.cancelBgColor;
-            self.titleLabel.font = self.cancelTitleFont;
-            [self setTitleColor:self.cancelTitleColor forState:UIControlStateNormal];
-            break;
-        case YPAlertButtonStyleDestructive:
-            self.backgroundColor = self.destructiveBgColor;
-            self.titleLabel.font = self.destructiveTitleFont;
-            [self setTitleColor:self.destructiveTitleColor forState:UIControlStateNormal];
-            break;
+    _fontDict = [NSMutableDictionary dictionaryWithDictionary:
+                 @{@(YPAlertButtonStyleFocus) : [UIFont boldSystemFontOfSize:17]}];
+    
+    _autoDismiss = YES;
+    _style = YPAlertButtonStyleDefault;
+    _cornerRadius = 5;
+}
+
+- (void)setColor:(UIColor *)color style:(YPAlertButtonStyle)style {
+    self.colorDict[@(style)] = color;
+}
+
+- (void)setTitleFont:(UIFont *)font style:(YPAlertButtonStyle)style {
+    self.fontDict[@(style)] = font;
+}
+
+- (void)update {
+    self.titleLabel.font = self.fontDict[@(self.style)];
+    if (self.isCorner) {
+        self.layer.cornerRadius = self.cornerRadius;
+        if (self.style == YPAlertButtonStyleDestructive ||
+            self.style == YPAlertButtonStyleFocus) {
+            [self setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            self.backgroundColor = self.colorDict[@(self.style)];
+        } else {
+            [self setTitleColor:self.colorDict[@(self.style)] forState:UIControlStateNormal];
+            self.layer.borderWidth = 1.0f / [UIScreen mainScreen].nativeScale;
+            self.layer.borderColor = [self.colorDict[@(self.style)] CGColor];
+        }
+    } else {
+        self.tintColor = self.colorDict[@(self.style)];
     }
 }
 

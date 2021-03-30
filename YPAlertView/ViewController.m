@@ -30,7 +30,7 @@
 
 - (IBAction)noTitle:(id)sender {
     YPAlertView *alert = [[YPAlertView alloc] initWithTitle:nil message:@"内容"];
-    YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel handler:^(YPAlertButton *button) {
+    YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel onPressed:^ {
         
     }];
     alert.tapBgToDismiss = YES;
@@ -43,7 +43,7 @@
             button.backgroundColor = [UIColor lightGrayColor];
         }
         alert.buttonSpace = 8;
-        alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
+        alert.buttonEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
     }
     
     [alert show];
@@ -51,7 +51,7 @@
 
 - (IBAction)noMessage:(id)sender {
     YPAlertView *alert = [[YPAlertView alloc] initWithTitle:@"标题" message:nil];
-    YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel handler:^(YPAlertButton *button) {
+    YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel onPressed:^ {
         
     }];
     alert.titleBgColor = [UIColor lightGrayColor];
@@ -64,7 +64,7 @@
             button.backgroundColor = [UIColor lightGrayColor];
         }
         alert.buttonSpace = 8;
-        alert.buttonsEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
+        alert.buttonEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
     }
     
     [alert show];
@@ -72,80 +72,45 @@
 
 - (IBAction)oneButton:(id)sender {
     YPAlertView *alert = [[YPAlertView alloc] initWithTitle:@"标题" message:@"内容"];
-    YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel handler:^(YPAlertButton *button) {
+    YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel onPressed:^ {
         
     }];
     [alert addButton:cancelButton];
     
     alert.style = self.styleSegmentedControl.selectedSegmentIndex;
-    
-    if (alert.style == YPAlertViewStyleCornerButton) {
-        for (YPAlertButton *button in alert.buttons) {
-            button.backgroundColor = [UIColor lightGrayColor];
-        }
-        alert.buttonSpace = 8;
-        alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
-    }
     alert.tapBgToDismiss = YES;
-    [alert show];
+    [alert showInView:self.view];
 }
 
 - (IBAction)twoButton:(id)sender {
-    YPAlertView *alert = [[YPAlertView alloc] initWithTitle:@"标题" message:@"内容"];
-    YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel handler:^(YPAlertButton *button) {
+    YPAlert()
+    .s_title(@"标题")
+    .s_message(@"内容")
+    .s_addCancelButton(@"取消", nil)
+    .s_addFocusButton(@"确定", ^{
         
-    }];
-    YPAlertButton *okButton = [YPAlertButton buttonWithTitle:@"确定" style:YPAlertButtonStyleDestructive handler:^(YPAlertButton *button) {
-        
-    }];
-    [alert addButton:cancelButton];
-    [alert addButton:okButton];
-    
-    alert.style = self.styleSegmentedControl.selectedSegmentIndex;
-    if (alert.style == YPAlertViewStyleCornerButton) {
-        for (YPAlertButton *button in alert.buttons) {
-            button.backgroundColor = [UIColor lightGrayColor];
-        }
-        alert.buttonSpace = 8;
-        alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
-    } else if (alert.style == YPAlertViewStyleActionSheet) {
-        alert.buttonSpace = 8;
-    }
-    [alert show];
+    })
+    .s_style(self.styleSegmentedControl.selectedSegmentIndex)
+    .s_show();
 }
 
 
 - (IBAction)threeButton:(id)sender {
-    YPAlertView *alert = [[YPAlertView alloc] initWithTitle:@"标题" message:@"内容"];
-    alert.dismissButton.hidden = NO;
-    YPAlertButton *okButton = [YPAlertButton buttonWithTitle:@"确定" style:YPAlertButtonStyleDestructive handler:^(YPAlertButton *button) {
-
-    }];
-    YPAlertButton *otherButton = [YPAlertButton buttonWithTitle:@"其他" style:YPAlertButtonStyleDefault handler:^(YPAlertButton *button) {
-
-    }];
-    YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel handler:^(YPAlertButton *button) {
+    
+    YPAlert()
+    .s_title(@"标题")
+    .s_message(@"内容")
+    .s_addCancelButton(@"取消", nil)
+    .s_addDestructiveButton(@"警告", ^{
         
-    }];
+    })
+    .s_addFocusButton(@"确定", ^{
+        
+    })
+    .s_buttonVertical(YES)
+    .s_style(self.styleSegmentedControl.selectedSegmentIndex)
+    .s_show();
     
-    [alert addButton:okButton];
-    [alert addButton:otherButton];
-    [alert addButton:cancelButton];
-    
-    alert.dismissButtonAppear = YES;
-    alert.style = self.styleSegmentedControl.selectedSegmentIndex;
-    
-    if (alert.style == YPAlertViewStyleCornerButton) {
-        for (YPAlertButton *button in alert.buttons) {
-            button.backgroundColor = [UIColor lightGrayColor];
-        }
-        alert.buttonSpace = 8;
-        alert.buttonsEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
-    } else if (alert.style == YPAlertViewStyleActionSheet) {
-        alert.buttonSpace = 8;
-    }
-    
-    [alert show];
 }
 
 @end
