@@ -21,6 +21,8 @@
     
 //    [YPAlertButton appearance].destructiveTitleFont = [UIFont boldSystemFontOfSize:18];
     
+    [YPAlertView appearance].messageEdgeInsets = UIEdgeInsetsMake(50, 10, 50, 10);
+    
     return YES;
 }
 

@@ -37,7 +37,7 @@
     _colorDict = [NSMutableDictionary dictionaryWithDictionary:
                   @{@(YPAlertButtonStyleDefault) : [UIColor systemBlueColor],
                     @(YPAlertButtonStyleCancel) : [UIColor darkGrayColor],
-                    @(YPAlertButtonStyleDestructive) : [UIColor colorWithRed:244 / 255.0f green:67 / 255.0f blue:54 / 255.0f alpha:1.0f],
+                    @(YPAlertButtonStyleDestructive) : [UIColor redColor],
                     @(YPAlertButtonStyleFocus) : [UIColor systemBlueColor],
                   }];
     
@@ -49,11 +49,11 @@
     _cornerRadius = 5;
 }
 
-- (void)setColor:(UIColor *)color style:(YPAlertButtonStyle)style {
+- (void)setColor:(UIColor *)color forStyle:(YPAlertButtonStyle)style {
     self.colorDict[@(style)] = color;
 }
 
-- (void)setTitleFont:(UIFont *)font style:(YPAlertButtonStyle)style {
+- (void)setTitleFont:(UIFont *)font forStyle:(YPAlertButtonStyle)style {
     self.fontDict[@(style)] = font;
 }
 

@@ -49,14 +49,6 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
 
 #pragma mark - 外部方法
 
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        [self _setup];
-    }
-    return self;
-}
-
 + (instancetype)alertWithTitle:(NSString *)title message:(NSString *)message {
     return [[self alloc] initWithTitle:title message:message];
 }
@@ -72,8 +64,8 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     if (self) {
         [self _setup];
         
-        _titleLabel.text = title;
-        _messageLabel.text = message;
+        self.title = title;
+        self.message = message;
     }
     return self;
 }
@@ -84,10 +76,73 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     if (self) {
         [self _setup];
         
-        _titleLabel.text = title;
-        _messageLabel.attributedText = message;
+        self.title = title;
+        self.attributedMessage = message;
     }
     return self;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        [self _setup];
+    }
+    return self;
+}
+
+- (void)setTitle:(NSString *)title {
+    _title = [title copy];
+    self.titleLabel.text = title;
+}
+
+- (void)setMessage:(NSString *)message {
+    _message = [message copy];
+    self.messageLabel.text = message;
+}
+
+- (void)setAttributedTitle:(NSAttributedString *)attributedTitle {
+    _attributedTitle = [attributedTitle copy];
+    self.titleLabel.attributedText = attributedTitle;
+}
+
+- (void)setAttributedMessage:(NSAttributedString *)attributedMessage {
+    _attributedMessage = [attributedMessage copy];
+    self.messageLabel.attributedText = attributedMessage;
+}
+
+- (void)setAlertCornerRadius:(CGFloat)alertCornerRadius {
+    _alertCornerRadius = alertCornerRadius;
+    self.layer.cornerRadius = alertCornerRadius;
+}
+
+- (void)setTitleBgImage:(UIImage *)titleBgImage {
+    _titleBgImage = titleBgImage;
+    self.titleView.image = titleBgImage;
+}
+
+- (void)setTitleBgColor:(UIColor *)titleBgColor {
+    _titleBgColor = titleBgColor;
+    self.titleView.backgroundColor = titleBgColor;
+}
+
+- (void)setTitleColor:(UIColor *)titleColor {
+    _titleColor = titleColor;
+    self.titleLabel.textColor = titleColor;
+}
+
+- (void)setTitleFont:(UIFont *)titleFont {
+    _titleFont = titleFont;
+    self.titleLabel.font = titleFont;
+}
+
+- (void)setMessageColor:(UIColor *)messageColor {
+    _messageColor = messageColor;
+    self.messageLabel.textColor = messageColor;
+}
+
+- (void)setMessageFont:(UIFont *)messageFont {
+    _messageFont = messageFont;
+    self.messageLabel.font = messageFont;
 }
 
 - (void)addButton:(YPAlertButton *)button {
@@ -134,7 +189,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     [self addButton:button];
 }
 
-- (void)setButtonHeight:(CGFloat)height style:(YPAlertViewStyle)style {
+- (void)setButtonHeight:(CGFloat)height forStyle:(YPAlertViewStyle)style {
     self.buttonHeightDict[@(style)] = @(height);
 }
 
@@ -212,41 +267,6 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
             completion();
         }
     }];
-}
-
-- (void)setAlertCornerRadius:(CGFloat)alertCornerRadius {
-    _alertCornerRadius = alertCornerRadius;
-    self.layer.cornerRadius = alertCornerRadius;
-}
-
-- (void)setTitleBgImage:(UIImage *)titleBgImage {
-    _titleBgImage = titleBgImage;
-    self.titleView.image = titleBgImage;
-}
-
-- (void)setTitleBgColor:(UIColor *)titleBgColor {
-    _titleBgColor = titleBgColor;
-    self.titleView.backgroundColor = titleBgColor;
-}
-
-- (void)setTitleColor:(UIColor *)titleColor {
-    _titleColor = titleColor;
-    self.titleLabel.textColor = titleColor;
-}
-
-- (void)setTitleFont:(UIFont *)titleFont {
-    _titleFont = titleFont;
-    self.titleLabel.font = titleFont;
-}
-
-- (void)setMessageColor:(UIColor *)messageColor {
-    _messageColor = messageColor;
-    self.messageLabel.textColor = messageColor;
-}
-
-- (void)setMessageFont:(UIFont *)messageFont {
-    _messageFont = messageFont;
-    self.messageLabel.font = messageFont;
 }
 
 - (void)setCustomView:(UIView *)view height:(CGFloat)height {
@@ -454,35 +474,6 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
                 }];
             }
         }
-    } else if (self.style == YPAlertViewStyleActionSheet) {
-        for (int i = 0; i < self.buttons.count; i++) {
-            YPAlertButton *button = self.buttons[i];
-            if (i == self.buttons.count - 1) {
-                if (button.style == YPAlertButtonStyleCancel && self.buttons.count > 1) {
-                    UIView *line = [[UIView alloc] init];
-                    line.backgroundColor = [UIColor colorWithWhite:0.95f alpha:1.0f];
-                    [self.buttonsView addSubview:line];
-                    [line mas_makeConstraints:^(MASConstraintMaker *make) {
-                        make.left.right.equalTo(button);
-                        make.height.mas_equalTo(self.buttonSpace);
-                        make.bottom.equalTo(button.mas_top);
-                    }];
-                    break;
-                }
-            }
-            [self addLineInView:button layout:^(MASConstraintMaker *make) {
-                make.left.top.right.equalTo(button);
-                make.height.equalTo(@(onePixel));
-            }];
-        }
-        if (iPhoneXSeries) {
-            YPAlertButton *button = [self.buttons lastObject];
-            [self addLineInView:self.buttonsView layout:^(MASConstraintMaker *make) {
-                make.left.right.equalTo(button);
-                make.top.equalTo(button.mas_bottom);
-                make.height.equalTo(@(onePixel));
-            }];
-        }
     }
     
     if (self.titleSeparatorHeight.floatValue > 0) {
@@ -522,11 +513,6 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
 }
 
 @end
-
-
-YPAlertView * YPAlert(void) {
-    return [[YPAlertView alloc] init];
-};
 
 @implementation YPAlertView (Add)
 
@@ -582,42 +568,42 @@ YPAlertView * YPAlert(void) {
     return alert;
 }
 
-- (YPAlertView *(^)(NSString *))s_title {
-    return ^YPAlertView *(NSString *title) {
-        self.titleLabel.text = title;
-        return self;
-    };
-}
+@end
 
-- (YPAlertView *(^)(NSString *))s_message {
-    return ^YPAlertView *(NSString *message) {
-        self.messageLabel.text = message;
-        return self;
-    };
-}
 
-- (YPAlertView *(^)(NSString *, void (^)(NSMutableAttributedString *)))s_attributedTitle {
+YPAlertView * YPAlert(void) {
+    return [[YPAlertView alloc] init];
+};
+
+@implementation YPAlertView (Chain)
+
+- (YPAlertView *(^)(NSString *, void (^)(NSMutableAttributedString *)))s_attrTitleBlock {
     return ^YPAlertView *(NSString *title, void (^block)(NSMutableAttributedString *)) {
         NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:title];
         if (block) {
             block(attr);
         }
-        self.titleLabel.attributedText = attr;
+        self.attributedTitle = attr;
         return self;
     };
 }
 
-- (YPAlertView *(^)(NSString *, void (^)(NSMutableAttributedString *)))s_attributedMessage {
+- (YPAlertView *(^)(NSString *, void (^)(NSMutableAttributedString *)))s_attrMessageBlock {
     return ^YPAlertView *(NSString *message, void (^block)(NSMutableAttributedString *)) {
         NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:message];
         if (block) {
             block(attr);
         }
-        self.messageLabel.attributedText = attr;
+        self.attributedMessage = attr;
         return self;
     };
 }
 
+
+ChainSetterImp(NSString *, title, setTitle)
+ChainSetterImp(NSString *, message, setMessage)
+ChainSetterImp(NSAttributedString *, attributedTitle, setAttributedTitle)
+ChainSetterImp(NSAttributedString *, attributedMessage, setAttributedMessage)
 ChainSetterImp(YPAlertViewStyle, style, setStyle)
 ChainSetterImp(UIEdgeInsets, titleEdgeInsets, setTitleEdgeInsets)
 ChainSetterImp(UIEdgeInsets, messageEdgeInsets, setMessageEdgeInsets)

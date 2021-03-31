@@ -32,8 +32,8 @@ typedef NS_ENUM(NSInteger, YPAlertButtonStyle) {
                           style:(YPAlertButtonStyle)style
                       onPressed:(void (^)(void))onPressed;
 
-- (void)setColor:(UIColor *)color style:(YPAlertButtonStyle)style UI_APPEARANCE_SELECTOR;
-- (void)setTitleFont:(UIFont *)font style:(YPAlertButtonStyle)style UI_APPEARANCE_SELECTOR;
+- (void)setColor:(UIColor *)color forStyle:(YPAlertButtonStyle)style UI_APPEARANCE_SELECTOR;
+- (void)setTitleFont:(UIFont *)font forStyle:(YPAlertButtonStyle)style UI_APPEARANCE_SELECTOR;
 
 - (void)update;
 

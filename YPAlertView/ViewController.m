@@ -98,8 +98,12 @@
 - (IBAction)threeButton:(id)sender {
     
     YPAlert()
-    .s_title(@"标题")
-    .s_message(@"内容")
+    .s_attrTitleBlock(@"这是一个富文本标题", ^(NSMutableAttributedString *attr) {
+        [attr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, 3)];
+    })
+    .s_attrMessageBlock(@"这是一个富文本内容", ^(NSMutableAttributedString *attr) {
+        [attr addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:NSMakeRange(3, 3)];
+    })
     .s_addCancelButton(@"取消", nil)
     .s_addDestructiveButton(@"警告", ^{
         

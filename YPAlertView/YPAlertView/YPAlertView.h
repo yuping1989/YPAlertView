@@ -26,6 +26,12 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 
 @property (nonatomic, strong, readonly) NSMutableArray <YPAlertButton *> *buttons;
 
+@property (nonatomic, copy) NSString *title;
+@property (nonatomic, copy) NSString *message;
+
+@property (nonatomic, copy) NSAttributedString *attributedTitle;
+@property (nonatomic, copy) NSAttributedString *attributedMessage;
+
 @property (nonatomic, assign) YPAlertViewStyle style;
 
 @property (nonatomic, assign) UIEdgeInsets titleEdgeInsets UI_APPEARANCE_SELECTOR;
@@ -70,7 +76,7 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 - (instancetype)initWithTitle:(NSString *)title
             attributedMessage:(NSAttributedString *)message;
 
-- (void)setButtonHeight:(CGFloat)height style:(YPAlertViewStyle)style UI_APPEARANCE_SELECTOR;
+- (void)setButtonHeight:(CGFloat)height forStyle:(YPAlertViewStyle)style UI_APPEARANCE_SELECTOR;
 
 - (void)addButton:(YPAlertButton *)button;
 - (void)addDefaultButtonWithTitle:(NSString *)title
@@ -117,25 +123,37 @@ YPAlertView * YPAlert(void);
                 okButtonTitle:(NSString *)okButtonTitle
                       onPressed:(void (^)(BOOL isOkButton))onPressed;
 
-/// 以下是采用链式语法进行Alert的初始化
+@end
+
+/**
+ * 此分类里的方法主要是采用链式语法进行Alert的初始化
+ */
+@interface YPAlertView (Chain)
+
 - (YPAlertView *(^)(NSString *title))s_title;
 - (YPAlertView *(^)(NSString *message))s_message;
 
-- (YPAlertView *(^)(NSString *title, void (^)(NSMutableAttributedString *attr)))s_attributedTitle;
-- (YPAlertView *(^)(NSString *message, void (^)(NSMutableAttributedString *attr)))s_attributedMessage;
+- (YPAlertView *(^)(NSAttributedString *title))s_attributedTitle;
+- (YPAlertView *(^)(NSAttributedString *message))s_attributedMessage;
+
+/// 这两个方法是用来做快速自定义的
+- (YPAlertView *(^)(NSString *title, void (^)(NSMutableAttributedString *attr)))s_attrTitleBlock;
+- (YPAlertView *(^)(NSString *message, void (^)(NSMutableAttributedString *attr)))s_attrMessageBlock;
 
 - (YPAlertView *(^)(YPAlertViewStyle style))s_style;
 
 - (YPAlertView *(^)(UIEdgeInsets insets))s_titleEdgeInsets;
 - (YPAlertView *(^)(UIEdgeInsets insets))s_messageEdgeInsets;
 
+// 按钮部分的insets，只在style == YPAlertViewStyleCornerButton时生效
 - (YPAlertView *(^)(UIEdgeInsets insets))s_buttonEdgeInsets;
+// 按钮间的间隔，只在style == YPAlertViewStyleCornerButton时生效
 - (YPAlertView *(^)(CGFloat num))s_buttonSpace;
 
+// 按钮排列方向
 - (YPAlertView *(^)(BOOL b))s_buttonVertical;
 
 - (YPAlertView *(^)(CGFloat num))s_alertViewWidth;
-
 - (YPAlertView *(^)(CGFloat num))s_alertCornerRadius;
 
 - (YPAlertView *(^)(UIImage *image))s_titleBgImage;
@@ -146,10 +164,16 @@ YPAlertView * YPAlert(void);
 - (YPAlertView *(^)(UIColor *color))s_messageColor;
 - (YPAlertView *(^)(UIFont *font))s_messageFont;
 
+// 按钮分割线颜色
 - (YPAlertView *(^)(UIColor *color))s_separatorColor;
+
+// 标题下方的分割线颜色
 - (YPAlertView *(^)(NSNumber *num))s_titleSeparatorHeight;
 
+// 点击背景部分关闭Alert，YPAlertViewStyleActionSheet默认为NO，其他为YES
 - (YPAlertView *(^)(BOOL b))s_tapBgToDismiss;
+
+// 是否在右上角显示关闭按钮
 - (YPAlertView *(^)(BOOL b))s_showDismissButton;
 
 - (YPAlertView *(^)(UIView *view))s_customView;
