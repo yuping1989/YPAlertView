@@ -293,6 +293,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     
     _mSeparatorColor = [UIColor colorWithWhite:0.85f alpha:1.0f];
     _mTitleSeparatorHeight = @([YPAlertView onePixel]);
+    _mMarginKeyboard = 10;
     
     NSDictionary *dict = @{@(YPAlertViewStyleSystem) : @44,
                            @(YPAlertViewStyleCornerButton) : @40,
@@ -303,6 +304,8 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     
     self.mTitleFont = [UIFont boldSystemFontOfSize:18];
     self.mMessageFont = [UIFont systemFontOfSize:16];
+    
+    [self addKeyboardObserver];
 }
 
 - (void)setMTitleEdgeInsets:(UIEdgeInsets)titleEdgeInsets {
@@ -512,6 +515,56 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     }
 }
 
+- (void)addKeyboardObserver {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+}
+
+- (void)removeKeyboardObserver {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+}
+
+- (void)keyboardWillShow:(NSNotification *)notification {
+    if (!self.mMoveFollowKeyboard) return;
+    
+    NSDictionary *userInfo = [notification userInfo];
+    NSValue *aValue = [userInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
+    CGRect keyboardRect = [aValue CGRectValue];
+    
+    NSValue *durationValue = [userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey];
+    NSTimeInterval duration;
+    [durationValue getValue:&duration];
+    [self mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.width.equalTo(@(self.mAlertViewWidth));
+        make.centerX.equalTo(self.superview);
+        make.bottom.equalTo(self.superview).offset(-keyboardRect.size.height - self.mMarginKeyboard);
+    }];
+    [UIView animateWithDuration:duration animations:^{
+        [self.superview layoutIfNeeded];
+    }];
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification {
+    if (!self.mMoveFollowKeyboard) return;
+    
+    NSDictionary *userInfo = [notification userInfo];
+    NSValue *animationDurationValue = [userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey];
+    NSTimeInterval duration;
+    [animationDurationValue getValue:&duration];
+    [self mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.width.equalTo(@(self.mAlertViewWidth));
+        make.center.equalTo(self.superview);
+    }];
+    [UIView animateWithDuration:duration animations:^{
+        [self.superview layoutIfNeeded];
+    }];
+}
+
+- (void)dealloc {
+    [self removeKeyboardObserver];
+}
+
 @end
 
 @implementation YPAlertView (Add)
@@ -610,6 +663,8 @@ ChainSetterImp(UIEdgeInsets, messageEdgeInsets, setMMessageEdgeInsets)
 ChainSetterImp(UIEdgeInsets, buttonEdgeInsets, setMButtonEdgeInsets)
 ChainSetterImp(CGFloat, buttonSpace, setMButtonSpace)
 ChainSetterImp(BOOL, buttonVertical, setMButtonVertical)
+ChainSetterImp(CGFloat, moveFollowKeyboard, setMMoveFollowKeyboard)
+ChainSetterImp(CGFloat, marginKeyboard, setMMarginKeyboard)
 
 ChainSetterImp(CGFloat, alertViewWidth, setMAlertViewWidth)
 ChainSetterImp(CGFloat, alertCornerRadius, setMAlertCornerRadius)
@@ -625,6 +680,12 @@ ChainSetterImp(BOOL, tapBgToDismiss, setMTapBgToDismiss)
 ChainSetterImp(BOOL, showDismissButton, setMShowDismissButton)
 ChainSetterImp(UIView *, customView, setMCustomView)
 
+- (YPAlertView *(^)(UIView *, CGFloat))customViewWithHeight {
+    return ^YPAlertView *(UIView *view, CGFloat height) {
+        [self mSetCustomView:view height:height];
+        return self;
+    };
+}
 
 - (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))addDefaultButton {
     return ^YPAlertView *(NSString *title, void (^onPressed)(void)) {

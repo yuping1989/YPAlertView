@@ -96,7 +96,8 @@
 
 
 - (IBAction)threeButton:(id)sender {
-    
+    UITextField *field = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
+    field.borderStyle = UITextBorderStyleRoundedRect;
     YPAlert()
     .attrTitleBlock(@"这是一个富文本标题", ^(NSMutableAttributedString *attr) {
         [attr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, 3)];
@@ -106,11 +107,14 @@
     })
     .addCancelButton(@"取消", nil)
     .addButton(@"警告", YPAlertButtonStyleWarning, NO, ^{
-        
+        [field resignFirstResponder];
     })
     .addFocusButton(@"确定", ^{
         
     })
+    .moveFollowKeyboard(YES)
+    .marginKeyboard(30)
+    .customViewWithHeight(field, 50)
     .buttonVertical(YES)
     .style(self.styleSegmentedControl.selectedSegmentIndex)
     .show();

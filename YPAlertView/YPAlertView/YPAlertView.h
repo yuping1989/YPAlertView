@@ -57,6 +57,9 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 @property (nonatomic, strong) UIColor *mSeparatorColor UI_APPEARANCE_SELECTOR;
 @property (nonatomic, strong) NSNumber *mTitleSeparatorHeight UI_APPEARANCE_SELECTOR;
 
+@property (nonatomic, assign) CGFloat mMarginKeyboard UI_APPEARANCE_SELECTOR;
+@property (nonatomic, assign) CGFloat mMoveFollowKeyboard UI_APPEARANCE_SELECTOR;
+
 @property (nonatomic, assign) BOOL mTapBgToDismiss UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic, assign) BOOL mShowDismissButton UI_APPEARANCE_SELECTOR;
@@ -148,13 +151,16 @@ YPAlertView * YPAlert(void);
 // 按钮部分的insets，只在style == YPAlertViewStyleCornerButton时生效
 - (YPAlertView *(^)(UIEdgeInsets insets))buttonEdgeInsets;
 // 按钮间的间隔，只在style == YPAlertViewStyleCornerButton时生效
-- (YPAlertView *(^)(CGFloat num))buttonSpace;
-
+- (YPAlertView *(^)(CGFloat space))buttonSpace;
 // 按钮排列方向
 - (YPAlertView *(^)(BOOL b))buttonVertical;
+// 是否跟着键盘移动
+- (YPAlertView *(^)(BOOL b))moveFollowKeyboard;
+// 底部底部与键盘的距离
+- (YPAlertView *(^)(CGFloat space))marginKeyboard;
 
-- (YPAlertView *(^)(CGFloat num))alertViewWidth;
-- (YPAlertView *(^)(CGFloat num))alertCornerRadius;
+- (YPAlertView *(^)(CGFloat width))alertViewWidth;
+- (YPAlertView *(^)(CGFloat radius))alertCornerRadius;
 
 - (YPAlertView *(^)(UIImage *image))titleBgImage;
 - (YPAlertView *(^)(UIColor *color))titleBgColor;
@@ -177,6 +183,7 @@ YPAlertView * YPAlert(void);
 - (YPAlertView *(^)(BOOL b))showDismissButton;
 
 - (YPAlertView *(^)(UIView *view))customView;
+- (YPAlertView *(^)(UIView *view, CGFloat height))customViewWithHeight;
 
 - (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))addDefaultButton;
 - (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))addCancelButton;
