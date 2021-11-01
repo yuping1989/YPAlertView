@@ -33,20 +33,20 @@
     YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel onPressed:^ {
         
     }];
-    alert.tapBgToDismiss = YES;
-    alert.style = self.styleSegmentedControl.selectedSegmentIndex;
+    alert.mTapBgToDismiss = YES;
+    alert.mStyle = self.styleSegmentedControl.selectedSegmentIndex;
     
-    [alert addButton:cancelButton];
+    [alert mAddButton:cancelButton];
     
-    if (alert.style == YPAlertViewStyleCornerButton) {
+    if (alert.mStyle == YPAlertViewStyleCornerButton) {
         for (YPAlertButton *button in alert.buttons) {
             button.backgroundColor = [UIColor lightGrayColor];
         }
-        alert.buttonSpace = 8;
-        alert.buttonEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
+        alert.mButtonSpace = 8;
+        alert.mButtonEdgeInsets = UIEdgeInsetsMake(0, 10, 10, 10);
     }
     
-    [alert show];
+    [alert mShow];
 }
 
 - (IBAction)noMessage:(id)sender {
@@ -54,20 +54,20 @@
     YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel onPressed:^ {
         
     }];
-    alert.titleBgColor = [UIColor lightGrayColor];
-    alert.style = self.styleSegmentedControl.selectedSegmentIndex;
+    alert.mTitleBgColor = [UIColor lightGrayColor];
+    alert.mStyle = self.styleSegmentedControl.selectedSegmentIndex;
     
-    [alert addButton:cancelButton];
+    [alert mAddButton:cancelButton];
     
-    if (alert.style == YPAlertViewStyleCornerButton) {
+    if (alert.mStyle == YPAlertViewStyleCornerButton) {
         for (YPAlertButton *button in alert.buttons) {
             button.backgroundColor = [UIColor lightGrayColor];
         }
-        alert.buttonSpace = 8;
-        alert.buttonEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
+        alert.mButtonSpace = 8;
+        alert.mButtonEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
     }
     
-    [alert show];
+    [alert mShow];
 }
 
 - (IBAction)oneButton:(id)sender {
@@ -75,45 +75,45 @@
     YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel onPressed:^ {
         
     }];
-    [alert addButton:cancelButton];
+    [alert mAddButton:cancelButton];
     
-    alert.style = self.styleSegmentedControl.selectedSegmentIndex;
-    alert.tapBgToDismiss = YES;
-    [alert showInView:self.view];
+    alert.mStyle = self.styleSegmentedControl.selectedSegmentIndex;
+    alert.mTapBgToDismiss = YES;
+    [alert mShowInView:self.view];
 }
 
 - (IBAction)twoButton:(id)sender {
     YPAlert()
-    .s_title(@"标题")
-    .s_message(@"内容")
-    .s_addCancelButton(@"取消", nil)
-    .s_addFocusButton(@"确定", ^{
+    .title(@"标题")
+    .message(@"内容")
+    .addCancelButton(@"取消", nil)
+    .addFocusButton(@"确定", ^{
         
     })
-    .s_style(self.styleSegmentedControl.selectedSegmentIndex)
-    .s_show();
+    .style(self.styleSegmentedControl.selectedSegmentIndex)
+    .show();
 }
 
 
 - (IBAction)threeButton:(id)sender {
     
     YPAlert()
-    .s_attrTitleBlock(@"这是一个富文本标题", ^(NSMutableAttributedString *attr) {
+    .attrTitleBlock(@"这是一个富文本标题", ^(NSMutableAttributedString *attr) {
         [attr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, 3)];
     })
-    .s_attrMessageBlock(@"这是一个富文本内容", ^(NSMutableAttributedString *attr) {
+    .attrMessageBlock(@"这是一个富文本内容", ^(NSMutableAttributedString *attr) {
         [attr addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:NSMakeRange(3, 3)];
     })
-    .s_addCancelButton(@"取消", nil)
-    .s_addDestructiveButton(@"警告", ^{
+    .addCancelButton(@"取消", nil)
+    .addButton(@"警告", YPAlertButtonStyleWarning, NO, ^{
         
     })
-    .s_addFocusButton(@"确定", ^{
+    .addFocusButton(@"确定", ^{
         
     })
-    .s_buttonVertical(YES)
-    .s_style(self.styleSegmentedControl.selectedSegmentIndex)
-    .s_show();
+    .buttonVertical(YES)
+    .style(self.styleSegmentedControl.selectedSegmentIndex)
+    .show();
     
 }
 

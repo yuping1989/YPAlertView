@@ -11,7 +11,7 @@
 typedef NS_ENUM(NSInteger, YPAlertButtonStyle) {
     YPAlertButtonStyleDefault,
     YPAlertButtonStyleCancel,
-    YPAlertButtonStyleDestructive,
+    YPAlertButtonStyleWarning,
     YPAlertButtonStyleFocus
 };
 

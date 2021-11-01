@@ -36,8 +36,8 @@
 - (void)_setup {
     _colorDict = [NSMutableDictionary dictionaryWithDictionary:
                   @{@(YPAlertButtonStyleDefault) : [UIColor systemBlueColor],
-                    @(YPAlertButtonStyleCancel) : [UIColor darkGrayColor],
-                    @(YPAlertButtonStyleDestructive) : [UIColor redColor],
+                    @(YPAlertButtonStyleCancel) : [UIColor colorWithWhite:0.3f alpha:1],
+                    @(YPAlertButtonStyleWarning) : [UIColor redColor],
                     @(YPAlertButtonStyleFocus) : [UIColor systemBlueColor],
                   }];
     
@@ -61,7 +61,7 @@
     self.titleLabel.font = self.fontDict[@(self.style)];
     if (self.isCorner) {
         self.layer.cornerRadius = self.cornerRadius;
-        if (self.style == YPAlertButtonStyleDestructive ||
+        if (self.style == YPAlertButtonStyleWarning ||
             self.style == YPAlertButtonStyleFocus) {
             [self setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
             self.backgroundColor = self.colorDict[@(self.style)];
