@@ -36,7 +36,7 @@
     alert.mTapBgToDismiss = YES;
     alert.mStyle = self.styleSegmentedControl.selectedSegmentIndex;
     
-    [alert mAddButton:cancelButton];
+    [alert addButton:cancelButton];
     
     if (alert.mStyle == YPAlertViewStyleCornerButton) {
         for (YPAlertButton *button in alert.buttons) {
@@ -57,7 +57,7 @@
     alert.mTitleBgColor = [UIColor lightGrayColor];
     alert.mStyle = self.styleSegmentedControl.selectedSegmentIndex;
     
-    [alert mAddButton:cancelButton];
+    [alert addButton:cancelButton];
     
     if (alert.mStyle == YPAlertViewStyleCornerButton) {
         for (YPAlertButton *button in alert.buttons) {
@@ -72,10 +72,11 @@
 
 - (IBAction)oneButton:(id)sender {
     YPAlertView *alert = [[YPAlertView alloc] initWithTitle:@"标题" message:@"内容"];
+    alert.mShowDismissButton = YES;
     YPAlertButton *cancelButton = [YPAlertButton buttonWithTitle:@"取消" style:YPAlertButtonStyleCancel onPressed:^ {
         
     }];
-    [alert mAddButton:cancelButton];
+    [alert addButton:cancelButton];
     
     alert.mStyle = self.styleSegmentedControl.selectedSegmentIndex;
     alert.mTapBgToDismiss = YES;
@@ -84,12 +85,13 @@
 
 - (IBAction)twoButton:(id)sender {
     YPAlert()
-    .title(@"标题")
-    .message(@"内容")
+    .title(@"标题标题标题标题标题标题标题标题标题标题标题")
+    .message(@"内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容")
     .addCancelButton(@"取消", nil)
     .addFocusButton(@"确定", ^{
         
     })
+    .showDismissButton(YES)
     .style(self.styleSegmentedControl.selectedSegmentIndex)
     .show();
 }

@@ -63,6 +63,9 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 @property (nonatomic, assign) BOOL mTapBgToDismiss UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic, assign) BOOL mShowDismissButton UI_APPEARANCE_SELECTOR;
+@property (nonatomic, copy) NSString *mDismissButtonTitle UI_APPEARANCE_SELECTOR;
+@property (nonatomic, strong) UIColor *mDismissButtonTintColor UI_APPEARANCE_SELECTOR;
+@property (nonatomic, assign) CGFloat mDismissButtonWidth UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic, strong) UIView *mCustomView;
 
@@ -80,27 +83,20 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
             attributedMessage:(NSAttributedString *)message;
 
 - (void)setButtonHeight:(CGFloat)height forStyle:(YPAlertViewStyle)style UI_APPEARANCE_SELECTOR;
+- (void)setDismissButtonImage:(UIImage *)image forState:(UIControlState)state UI_APPEARANCE_SELECTOR;
 
-- (void)mAddButton:(YPAlertButton *)button;
-- (void)mAddDefaultButtonWithTitle:(NSString *)title
-                         onPressed:(void (^)(void))onPressed;
-- (void)mAddWarningButtonWithTitle:(NSString *)title
-                         onPressed:(void (^)(void))onPressed;
-- (void)mAddCancelButtonWithTitle:(NSString *)title
-                        onPressed:(void (^)(void))onPressed;
-- (void)mAddFocusButtonWithTitle:(NSString *)title
-                       onPressed:(void (^)(void))onPressed;
-- (void)mAddButtonWithTitle:(NSString *)title
+- (void)addButton:(YPAlertButton *)button;
+- (void)addButtonWithTitle:(NSString *)title
                       style:(YPAlertButtonStyle)style
                   onPressed:(void (^)(void))onPressed;
 
-- (void)mSetCustomView:(UIView *)view height:(CGFloat)height;
+- (void)setMCustomView:(UIView *)view height:(CGFloat)height;
 
 - (void)mShow;
 - (void)mShowInView:(UIView *)view;
 
-- (void)mDismiss;
-- (void)mDismissWithCompletion:(void (^)(void))completion;
+- (void)dismiss;
+- (void)dismissWithCompletion:(void (^)(void))completion;
 
 @end
 
@@ -154,6 +150,8 @@ YPAlertView * YPAlert(void);
 - (YPAlertView *(^)(CGFloat space))buttonSpace;
 // 按钮排列方向
 - (YPAlertView *(^)(BOOL b))buttonVertical;
+- (YPAlertView *(^)(CGFloat height, UIControlState state))buttonHeight;
+
 // 是否跟着键盘移动
 - (YPAlertView *(^)(BOOL b))moveFollowKeyboard;
 // 底部底部与键盘的距离
@@ -179,8 +177,12 @@ YPAlertView * YPAlert(void);
 // 点击背景部分关闭Alert，YPAlertViewStyleActionSheet默认为NO，其他为YES
 - (YPAlertView *(^)(BOOL b))tapBgToDismiss;
 
-// 是否在右上角显示关闭按钮
+// 右上角显示关闭按钮设置
 - (YPAlertView *(^)(BOOL b))showDismissButton;
+- (YPAlertView *(^)(NSString *))dismissButtonTitle;
+- (YPAlertView *(^)(UIColor *))dismissButtonTintColor;
+- (YPAlertView *(^)(CGFloat))dismissButtonWidth;
+- (YPAlertView *(^)(UIImage *image, UIControlState state))dismissButtonImage;
 
 - (YPAlertView *(^)(UIView *view))customView;
 - (YPAlertView *(^)(UIView *view, CGFloat height))customViewWithHeight;

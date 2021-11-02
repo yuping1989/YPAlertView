@@ -36,7 +36,7 @@
 - (void)_setup {
     _colorDict = [NSMutableDictionary dictionaryWithDictionary:
                   @{@(YPAlertButtonStyleDefault) : [UIColor systemBlueColor],
-                    @(YPAlertButtonStyleCancel) : [UIColor colorWithWhite:0.3f alpha:1],
+                    @(YPAlertButtonStyleCancel) : [UIColor colorWithWhite:0.2f alpha:1],
                     @(YPAlertButtonStyleWarning) : [UIColor redColor],
                     @(YPAlertButtonStyleFocus) : [UIColor systemBlueColor],
                   }];

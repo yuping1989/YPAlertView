@@ -21,7 +21,11 @@
     
 //    [YPAlertButton appearance].destructiveTitleFont = [UIFont boldSystemFontOfSize:18];
     
-    [YPAlertView appearance].mMessageEdgeInsets = UIEdgeInsetsMake(50, 10, 50, 10);
+//    [YPAlertView appearance].mMessageEdgeInsets = UIEdgeInsetsMake(50, 10, 50, 10);
+    
+    [[YPAlertView appearance] setMDismissButtonTintColor:[UIColor redColor]];
+    [[YPAlertView appearance] setDismissButtonImage:[UIImage imageNamed:@"btn_delete"] forState:UIControlStateNormal];
+    [[YPAlertView appearance] setMDismissButtonWidth:44];
     
     return YES;
 }

@@ -145,7 +145,21 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     self.messageLabel.font = messageFont;
 }
 
-- (void)mAddButton:(YPAlertButton *)button {
+- (void)setMDismissButtonTitle:(NSString *)dismissButtonTitle {
+    _mDismissButtonTitle = dismissButtonTitle;
+    self.dismissButton.titleLabel.text = dismissButtonTitle;
+}
+
+- (void)setMDismissButtonTintColor:(UIColor *)dismissButtonTintColor {
+    _mDismissButtonTintColor = dismissButtonTintColor;
+    self.dismissButton.tintColor = dismissButtonTintColor;
+}
+
+- (void)setDismissButtonImage:(UIImage *)image forState:(UIControlState)state {
+    [self.dismissButton setImage:image forState:state];
+}
+
+- (void)addButton:(YPAlertButton *)button {
     if (!button) {
         return;
     }
@@ -154,39 +168,11 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     [self.buttonsView addSubview:button];
 }
 
-- (void)mAddDefaultButtonWithTitle:(NSString *)title
-                         onPressed:(void (^)(void))onPressed {
-    [self mAddButtonWithTitle:title
-                       style:YPAlertButtonStyleDefault
-                     onPressed:onPressed];
-}
-
-- (void)mAddCancelButtonWithTitle:(NSString *)title
-                        onPressed:(void (^)(void))onPressed {
-    [self mAddButtonWithTitle:title
-                        style:YPAlertButtonStyleCancel
-                    onPressed:onPressed];
-}
-
-- (void)mAddWarningButtonWithTitle:(NSString *)title
-                         onPressed:(void (^)(void))onPressed {
-    [self mAddButtonWithTitle:title
-                        style:YPAlertButtonStyleWarning
-                    onPressed:onPressed];
-}
-
-- (void)mAddFocusButtonWithTitle:(NSString *)title
-                       onPressed:(void (^)(void))onPressed {
-    [self mAddButtonWithTitle:title
-                        style:YPAlertButtonStyleFocus
-                    onPressed:onPressed];
-}
-
-- (void)mAddButtonWithTitle:(NSString *)title
+- (void)addButtonWithTitle:(NSString *)title
                       style:(YPAlertButtonStyle)style
                   onPressed:(void (^)(void))onPressed {
     YPAlertButton *button = [YPAlertButton buttonWithTitle:title style:style onPressed:onPressed];
-    [self mAddButton:button];
+    [self addButton:button];
 }
 
 - (void)setButtonHeight:(CGFloat)height forStyle:(YPAlertViewStyle)style {
@@ -200,6 +186,9 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
 
 - (void)mShowInView:(UIView *)view {
     [[[UIApplication sharedApplication] keyWindow] endEditing:YES];
+    if (view == nil) {
+        view = [UIApplication sharedApplication].windows.firstObject;
+    }
     
     [view addSubview:self.maskView];
     [view addSubview:self];
@@ -241,11 +230,11 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     }
 }
 
-- (void)mDismiss {
-    [self mDismissWithCompletion:nil];
+- (void)dismiss {
+    [self dismissWithCompletion:nil];
 }
 
-- (void)mDismissWithCompletion:(void (^)(void))completion {
+- (void)dismissWithCompletion:(void (^)(void))completion {
     
     if (self.mStyle == YPAlertViewStyleActionSheet) {
         [self mas_remakeConstraints:^(MASConstraintMaker *make) {
@@ -269,7 +258,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     }];
 }
 
-- (void)mSetCustomView:(UIView *)view height:(CGFloat)height {
+- (void)setMCustomView:(UIView *)view height:(CGFloat)height {
     self.mCustomView = view;
     self.customViewHeight = height;
 }
@@ -284,7 +273,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
 - (void)_setup {
     _buttons = [NSMutableArray array];
     
-    _mTitleEdgeInsets = UIEdgeInsetsMake(10, 10, 11, 10);
+    _mTitleEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
     _mMessageEdgeInsets = UIEdgeInsetsMake(20, 15, 20, 15);
     
     _mAlertViewWidth = 300;
@@ -297,8 +286,9 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     
     NSDictionary *dict = @{@(YPAlertViewStyleSystem) : @44,
                            @(YPAlertViewStyleCornerButton) : @40,
-                           @(YPAlertViewStyleActionSheet) : @55};
+                           @(YPAlertViewStyleActionSheet) : @60};
     _buttonHeightDict = [NSMutableDictionary dictionaryWithDictionary:dict];
+    _mDismissButtonWidth = 44;
     
     [self initViews];
     
@@ -347,7 +337,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
 
 - (void)maskViewTapped {
     if (self.mTapBgToDismiss) {
-        [self mDismiss];
+        [self dismiss];
     }
 }
 
@@ -355,8 +345,8 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     if (!_dismissButton) {
         _dismissButton = [UIButton buttonWithType:UIButtonTypeSystem];
         _dismissButton.titleLabel.font = [UIFont systemFontOfSize:14];
-        [_dismissButton addTarget:self action:@selector(mDismiss) forControlEvents:UIControlEventTouchUpInside];
-        [_dismissButton setTitle:@"关闭" forState:UIControlStateNormal];
+        [_dismissButton addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
+        [_dismissButton setTitle:self.mDismissButtonTitle forState:UIControlStateNormal];
         [_titleView addSubview:_dismissButton];
     }
     return _dismissButton;
@@ -386,19 +376,25 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
         if (self.titleLabel.text) {
             insets = self.mTitleEdgeInsets;
         }
+        if (self.showDismissButton) {
+            insets.left += self.mDismissButtonWidth + 10;
+            insets.right += self.mDismissButtonWidth + 10;
+        }
         make.edges.equalTo(self.titleView).insets(insets);
     }];
     
     if (self.mShowDismissButton) {
         [self.dismissButton mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.top.right.bottom.equalTo(self.titleView);
-            make.width.mas_equalTo(44);
+            make.top.right.equalTo(self);
+            make.width.mas_equalTo(self.mDismissButtonWidth);
+            CGFloat titleTextHeight = [self heightForString:@"标题" font:self.mTitleFont];
+            make.height.mas_equalTo(titleTextHeight + self.mTitleEdgeInsets.top + self.mTitleEdgeInsets.bottom);
         }];
     }
     
     [self.messageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.equalTo(self);
-        make.top.equalTo(self.titleView.mas_bottom);
+        make.top.equalTo(self.titleView.mas_bottom).offset(self.mTitleSeparatorHeight.floatValue);
     }];
     
     [self.messageLabel mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -502,7 +498,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
         button.onPressed();
     }
     if (button.autoDismiss) {
-        [self mDismiss];
+        [self dismiss];
     }
 }
 
@@ -565,6 +561,19 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     [self removeKeyboardObserver];
 }
 
+- (CGFloat)heightForString:(NSString *)string font:(UIFont *)font {
+    if (!font) {
+        return 0;
+    }
+    NSMutableDictionary *attr = [[NSMutableDictionary alloc] init];
+    attr[NSFontAttributeName] = font;
+    
+    CGRect rect = [string boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)
+                                     options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading
+                                  attributes:attr context:nil];
+    return rect.size.height;
+}
+
 @end
 
 @implementation YPAlertView (Add)
@@ -604,14 +613,14 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
                     onPressed:(void (^)(BOOL))onPressed {
     YPAlertView *alert = [[YPAlertView alloc] initWithTitle:title message:message];
     if (cancelButtonTitle) {
-        [alert mAddCancelButtonWithTitle:cancelButtonTitle onPressed:^{
+        [alert addButtonWithTitle:cancelButtonTitle style:YPAlertButtonStyleCancel onPressed:^{
             if (onPressed) {
                 onPressed(NO);
             }
         }];
     }
     if (okButtonTitle) {
-        [alert mAddWarningButtonWithTitle:okButtonTitle onPressed:^{
+        [alert addButtonWithTitle:okButtonTitle style:YPAlertButtonStyleFocus onPressed:^{
             if (onPressed) {
                 onPressed(YES);
             }
@@ -663,7 +672,7 @@ ChainSetterImp(UIEdgeInsets, messageEdgeInsets, setMMessageEdgeInsets)
 ChainSetterImp(UIEdgeInsets, buttonEdgeInsets, setMButtonEdgeInsets)
 ChainSetterImp(CGFloat, buttonSpace, setMButtonSpace)
 ChainSetterImp(BOOL, buttonVertical, setMButtonVertical)
-ChainSetterImp(CGFloat, moveFollowKeyboard, setMMoveFollowKeyboard)
+ChainSetterImp(BOOL, moveFollowKeyboard, setMMoveFollowKeyboard)
 ChainSetterImp(CGFloat, marginKeyboard, setMMarginKeyboard)
 
 ChainSetterImp(CGFloat, alertViewWidth, setMAlertViewWidth)
@@ -678,39 +687,56 @@ ChainSetterImp(UIColor *, separatorColor, setMSeparatorColor)
 ChainSetterImp(NSNumber *, titleSeparatorHeight, setMTitleSeparatorHeight)
 ChainSetterImp(BOOL, tapBgToDismiss, setMTapBgToDismiss)
 ChainSetterImp(BOOL, showDismissButton, setMShowDismissButton)
+ChainSetterImp(NSString *, dismissButtonTitle, setMDismissButtonTitle)
+ChainSetterImp(UIColor *, dismissButtonTintColor, setMDismissButtonTintColor)
+ChainSetterImp(CGFloat, dismissButtonWidth, setMDismissButtonWidth)
 ChainSetterImp(UIView *, customView, setMCustomView)
+
+- (YPAlertView *(^)(CGFloat, UIControlState))buttonHeight {
+    return ^YPAlertView *(CGFloat height, UIControlState state) {
+        [self setButtonHeight:height forStyle:state];
+        return self;
+    };
+}
+
+- (YPAlertView *(^)(UIImage *, UIControlState))dismissButtonImage {
+    return ^YPAlertView *(UIImage *image, UIControlState state) {
+        [self setDismissButtonImage:image forState:state];
+        return self;
+    };
+}
 
 - (YPAlertView *(^)(UIView *, CGFloat))customViewWithHeight {
     return ^YPAlertView *(UIView *view, CGFloat height) {
-        [self mSetCustomView:view height:height];
+        [self setMCustomView:view height:height];
         return self;
     };
 }
 
 - (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))addDefaultButton {
     return ^YPAlertView *(NSString *title, void (^onPressed)(void)) {
-        [self mAddDefaultButtonWithTitle:title onPressed:onPressed];
+        [self addButtonWithTitle:title style:YPAlertButtonStyleDefault onPressed:onPressed];
         return self;
     };
 }
 
 - (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))addCancelButton {
     return ^YPAlertView *(NSString *title, void (^onPressed)(void)) {
-        [self mAddCancelButtonWithTitle:title onPressed:onPressed];
+        [self addButtonWithTitle:title style:YPAlertButtonStyleCancel onPressed:onPressed];
         return self;
     };
 }
 
 - (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))addWarningButton {
     return ^YPAlertView *(NSString *title, void (^onPressed)(void)) {
-        [self mAddWarningButtonWithTitle:title onPressed:onPressed];
+        [self addButtonWithTitle:title style:YPAlertButtonStyleWarning onPressed:onPressed];
         return self;
     };
 }
 
 - (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))addFocusButton {
     return ^YPAlertView *(NSString *title, void (^onPressed)(void)) {
-        [self mAddFocusButtonWithTitle:title onPressed:onPressed];
+        [self addButtonWithTitle:title style:YPAlertButtonStyleFocus onPressed:onPressed];
         return self;
     };
 }
@@ -719,7 +745,7 @@ ChainSetterImp(UIView *, customView, setMCustomView)
     return ^YPAlertView *(NSString *title, YPAlertButtonStyle style, BOOL autoDismiss, void (^onPressed)(void)) {
         YPAlertButton *button = [YPAlertButton buttonWithTitle:title style:style onPressed:onPressed];
         button.autoDismiss = autoDismiss;
-        [self mAddButton:button];
+        [self addButton:button];
         return self;
     };
 }
