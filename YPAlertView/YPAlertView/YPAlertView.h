@@ -36,6 +36,7 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 
 @property (nonatomic, assign) UIEdgeInsets mTitleEdgeInsets UI_APPEARANCE_SELECTOR;
 @property (nonatomic, assign) UIEdgeInsets mMessageEdgeInsets UI_APPEARANCE_SELECTOR;
+@property (nonatomic, assign) UIEdgeInsets mCustomViewEdgeInsets UI_APPEARANCE_SELECTOR;
 
 // 以下2个属性仅在style == YPAlertViewStyleCornerButton时生效
 @property (nonatomic, assign) UIEdgeInsets mButtonEdgeInsets UI_APPEARANCE_SELECTOR;
@@ -87,8 +88,8 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 
 - (void)addButton:(YPAlertButton *)button;
 - (void)addButtonWithTitle:(NSString *)title
-                      style:(YPAlertButtonStyle)style
-                  onPressed:(void (^)(void))onPressed;
+                     style:(YPAlertButtonStyle)style
+                 onPressed:(void (^)(void))onPressed;
 - (void)addDefaultButtonWithTitle:(NSString *)title
                         onPressed:(void (^)(void))onPressed;
 - (void)addCancelButtonWithTitle:(NSString *)title
@@ -152,6 +153,7 @@ YPAlertView * YPAlert(void);
 
 - (YPAlertView *(^)(UIEdgeInsets insets))titleEdgeInsets;
 - (YPAlertView *(^)(UIEdgeInsets insets))messageEdgeInsets;
+- (YPAlertView *(^)(UIEdgeInsets insets))customViewEdgeInsets;
 
 // 按钮部分的insets，只在style == YPAlertViewStyleCornerButton时生效
 - (YPAlertView *(^)(UIEdgeInsets insets))buttonEdgeInsets;
@@ -173,9 +175,11 @@ YPAlertView * YPAlert(void);
 - (YPAlertView *(^)(UIColor *color))titleBgColor;
 - (YPAlertView *(^)(UIColor *color))titleColor;
 - (YPAlertView *(^)(UIFont *font))titleFont;
+- (YPAlertView *(^)(void (^)(UILabel *label)))configTitleLabel;
 
 - (YPAlertView *(^)(UIColor *color))messageColor;
 - (YPAlertView *(^)(UIFont *font))messageFont;
+- (YPAlertView *(^)(void (^)(UILabel *label)))configMessageLabel;
 
 // 按钮分割线颜色
 - (YPAlertView *(^)(UIColor *color))separatorColor;

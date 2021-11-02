@@ -107,6 +107,10 @@
     .attrMessageBlock(@"这是一个富文本内容", ^(NSMutableAttributedString *attr) {
         [attr addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:NSMakeRange(3, 3)];
     })
+    .configMessageLabel(^(UILabel *label) {
+        label.backgroundColor = [UIColor grayColor];
+        label.textAlignment = NSTextAlignmentLeft;
+    })
     .addCancelButton(@"取消", nil)
     .addButton(@"警告", YPAlertButtonStyleWarning, NO, ^{
         [field resignFirstResponder];
@@ -117,10 +121,10 @@
     .moveFollowKeyboard(YES)
     .marginKeyboard(30)
     .customViewWithHeight(field, 50)
+    .customViewEdgeInsets(UIEdgeInsetsMake(20, 20, 20, 20))
     .buttonVertical(YES)
     .style(self.styleSegmentedControl.selectedSegmentIndex)
     .show();
-    
 }
 
 @end

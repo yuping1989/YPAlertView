@@ -169,8 +169,8 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
 }
 
 - (void)addButtonWithTitle:(NSString *)title
-                      style:(YPAlertButtonStyle)style
-                  onPressed:(void (^)(void))onPressed {
+                     style:(YPAlertButtonStyle)style
+                 onPressed:(void (^)(void))onPressed {
     YPAlertButton *button = [YPAlertButton buttonWithTitle:title style:style onPressed:onPressed];
     [self addButton:button];
 }
@@ -202,7 +202,6 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
                        style:YPAlertButtonStyleFocus
                      onPressed:onPressed];
 }
-
 
 - (void)setButtonHeight:(CGFloat)height forStyle:(YPAlertViewStyle)style {
     self.buttonHeightDict[@(style)] = @(height);
@@ -304,6 +303,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     
     _mTitleEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
     _mMessageEdgeInsets = UIEdgeInsetsMake(20, 15, 20, 15);
+    _mCustomViewEdgeInsets = UIEdgeInsetsZero;
     
     _mAlertViewWidth = 300;
     _mButtonSpace = 10;
@@ -438,8 +438,9 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     if (self.mCustomView) {
         buttonTopView = self.mCustomView;
         [self.mCustomView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.top.equalTo(self.messageView.mas_bottom);
-            make.left.right.equalTo(self);
+            make.top.equalTo(self.messageView.mas_bottom).offset(self.mCustomViewEdgeInsets.top);
+            make.left.equalTo(self).offset(self.mCustomViewEdgeInsets.left);
+            make.right.equalTo(self).offset(-self.mCustomViewEdgeInsets.right);
             if (self.customViewHeight > 0) {
                 make.height.mas_equalTo(self.customViewHeight);
             }
@@ -478,9 +479,13 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     if (self.mStyle == YPAlertViewStyleActionSheet && iPhoneXSeries) {
         bottom = -34;
     }
+    CGFloat top = self.mButtonEdgeInsets.top;
+    if (self.customView) {
+        top += self.mCustomViewEdgeInsets.bottom;
+    }
     [self.buttonsView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self).offset(self.mButtonEdgeInsets.left);
-        make.top.equalTo(buttonTopView.mas_bottom).offset(self.mButtonEdgeInsets.top);
+        make.top.equalTo(buttonTopView.mas_bottom).offset(top);
         make.right.equalTo(self).offset(-self.mButtonEdgeInsets.right);
         make.bottom.equalTo(self).offset(bottom - self.mButtonEdgeInsets.bottom);
     }];
@@ -698,6 +703,7 @@ ChainSetterImp(NSAttributedString *, attributedMessage, setMAttributedMessage)
 ChainSetterImp(YPAlertViewStyle, style, setMStyle)
 ChainSetterImp(UIEdgeInsets, titleEdgeInsets, setMTitleEdgeInsets)
 ChainSetterImp(UIEdgeInsets, messageEdgeInsets, setMMessageEdgeInsets)
+ChainSetterImp(UIEdgeInsets, customViewEdgeInsets, setMCustomViewEdgeInsets)
 ChainSetterImp(UIEdgeInsets, buttonEdgeInsets, setMButtonEdgeInsets)
 ChainSetterImp(CGFloat, buttonSpace, setMButtonSpace)
 ChainSetterImp(BOOL, buttonVertical, setMButtonVertical)
@@ -720,6 +726,24 @@ ChainSetterImp(NSString *, dismissButtonTitle, setMDismissButtonTitle)
 ChainSetterImp(UIColor *, dismissButtonTintColor, setMDismissButtonTintColor)
 ChainSetterImp(CGFloat, dismissButtonWidth, setMDismissButtonWidth)
 ChainSetterImp(UIView *, customView, setMCustomView)
+
+- (YPAlertView *(^)(void (^)(UILabel *)))configTitleLabel {
+    return ^YPAlertView *(void (^block)(UILabel *)) {
+        if (block) {
+            block(self.titleLabel);
+        }
+        return self;
+    };
+}
+
+- (YPAlertView *(^)(void (^)(UILabel *)))configMessageLabel {
+    return ^YPAlertView *(void (^block)(UILabel *)) {
+        if (block) {
+            block(self.messageLabel);
+        }
+        return self;
+    };
+}
 
 - (YPAlertView *(^)(CGFloat, UIControlState))buttonHeight {
     return ^YPAlertView *(CGFloat height, UIControlState state) {
