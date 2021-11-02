@@ -321,8 +321,8 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     
     [self initViews];
     
-    self.mTitleFont = [UIFont boldSystemFontOfSize:18];
-    self.mMessageFont = [UIFont systemFontOfSize:16];
+    self.titleLabel.font = [UIFont boldSystemFontOfSize:18];
+    self.messageLabel.font = [UIFont systemFontOfSize:16];
     
     [self addKeyboardObserver];
 }
