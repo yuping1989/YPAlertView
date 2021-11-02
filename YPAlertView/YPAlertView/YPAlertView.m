@@ -175,6 +175,35 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
     [self addButton:button];
 }
 
+- (void)addDefaultButtonWithTitle:(NSString *)title
+                        onPressed:(void (^)(void))onPressed {
+    [self addButtonWithTitle:title
+                       style:YPAlertButtonStyleDefault
+                   onPressed:onPressed];
+}
+
+- (void)addCancelButtonWithTitle:(NSString *)title
+                       onPressed:(void (^)(void))onPressed {
+    [self addButtonWithTitle:title
+                       style:YPAlertButtonStyleCancel
+                   onPressed:onPressed];
+}
+
+- (void)addWarningButtonWithTitle:(NSString *)title
+                        onPressed:(void (^)(void))onPressed {
+    [self addButtonWithTitle:title
+                       style:YPAlertButtonStyleWarning
+                     onPressed:onPressed];
+}
+
+- (void)addFocusButtonWithTitle:(NSString *)title
+                      onPressed:(void (^)(void))onPressed {
+    [self addButtonWithTitle:title
+                       style:YPAlertButtonStyleFocus
+                     onPressed:onPressed];
+}
+
+
 - (void)setButtonHeight:(CGFloat)height forStyle:(YPAlertViewStyle)style {
     self.buttonHeightDict[@(style)] = @(height);
 }

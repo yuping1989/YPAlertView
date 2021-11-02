@@ -89,6 +89,15 @@ typedef NS_ENUM(NSInteger, YPAlertViewStyle) {
 - (void)addButtonWithTitle:(NSString *)title
                       style:(YPAlertButtonStyle)style
                   onPressed:(void (^)(void))onPressed;
+- (void)addDefaultButtonWithTitle:(NSString *)title
+                        onPressed:(void (^)(void))onPressed;
+- (void)addCancelButtonWithTitle:(NSString *)title
+                       onPressed:(void (^)(void))onPressed;
+- (void)addWarningButtonWithTitle:(NSString *)title
+                        onPressed:(void (^)(void))onPressed;
+- (void)addFocusButtonWithTitle:(NSString *)title
+                      onPressed:(void (^)(void))onPressed;
+
 
 - (void)setMCustomView:(UIView *)view height:(CGFloat)height;
 
