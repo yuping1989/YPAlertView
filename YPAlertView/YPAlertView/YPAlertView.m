@@ -132,7 +132,9 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
 
 - (void)setMTitleFont:(UIFont *)titleFont {
     _mTitleFont = titleFont;
-    self.titleLabel.font = titleFont;
+    if (!self.attributedTitle) {
+        self.titleLabel.font = titleFont;
+    }
 }
 
 - (void)setMMessageColor:(UIColor *)messageColor {
@@ -142,7 +144,9 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
 
 - (void)setMMessageFont:(UIFont *)messageFont {
     _mMessageFont = messageFont;
-    self.messageLabel.font = messageFont;
+    if (!self.attributedMessage) {
+        self.messageLabel.font = messageFont;
+    }
 }
 
 - (void)setMDismissButtonTitle:(NSString *)dismissButtonTitle {
@@ -416,7 +420,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
         [self.dismissButton mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.right.equalTo(self);
             make.width.mas_equalTo(self.mDismissButtonWidth);
-            CGFloat titleTextHeight = [self heightForString:@"标题" font:self.mTitleFont];
+            CGFloat titleTextHeight = [self heightForString:@"标题" font:self.titleLabel.font];
             make.height.mas_equalTo(titleTextHeight + self.mTitleEdgeInsets.top + self.mTitleEdgeInsets.bottom);
         }];
     }
