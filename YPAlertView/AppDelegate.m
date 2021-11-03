@@ -23,7 +23,7 @@
     
 //    [YPAlertView appearance].mMessageEdgeInsets = UIEdgeInsetsMake(50, 10, 50, 10);
     
-    [[YPAlertView appearance] setMTitleFont:[UIFont boldSystemFontOfSize:22]];
+    [[YPAlertView appearance] setMTitleFont:[UIFont boldSystemFontOfSize:30]];
     
     [[YPAlertView appearance] setMDismissButtonTintColor:[UIColor redColor]];
     [[YPAlertView appearance] setDismissButtonImage:[UIImage imageNamed:@"btn_delete"] forState:UIControlStateNormal];

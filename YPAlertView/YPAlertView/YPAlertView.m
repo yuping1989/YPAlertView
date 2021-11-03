@@ -132,7 +132,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
 
 - (void)setMTitleFont:(UIFont *)titleFont {
     _mTitleFont = titleFont;
-    if (!self.attributedTitle) {
+    if (!self.mAttributedTitle) {
         self.titleLabel.font = titleFont;
     }
 }
@@ -144,7 +144,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
 
 - (void)setMMessageFont:(UIFont *)messageFont {
     _mMessageFont = messageFont;
-    if (!self.attributedMessage) {
+    if (!self.mAttributedMessage) {
         self.messageLabel.font = messageFont;
     }
 }
