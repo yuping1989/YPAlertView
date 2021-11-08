@@ -204,7 +204,7 @@ YPAlertView * YPAlert(void);
 - (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))addCancelButton;
 - (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))addWarningButton;
 - (YPAlertView *(^)(NSString *title, void (^onPressed)(void)))addFocusButton;
-- (YPAlertView *(^)(NSString *title, YPAlertButtonStyle style, BOOL autoDismiss, void (^onPressed)(void)))addButton;
+- (YPAlertView *(^)(void(^config)(YPAlertButton *button)))addButton;
 
 - (YPAlertView *(^)(void))show;
 - (YPAlertView *(^)(UIView *view))showInView;

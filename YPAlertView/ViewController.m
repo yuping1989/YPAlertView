@@ -101,7 +101,7 @@
     UITextField *field = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
     field.borderStyle = UITextBorderStyleRoundedRect;
     YPAlert()
-    .attrTitleBlock(@"这是一个富文本标题", ^(NSMutableAttributedString *attr) {
+    .attrTitleBlock(@"这是一个富文本标题这是一个富文本标题", ^(NSMutableAttributedString *attr) {
         [attr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, 3)];
     })
     .attrMessageBlock(@"这是一个富文本内容", ^(NSMutableAttributedString *attr) {
@@ -112,8 +112,13 @@
         label.textAlignment = NSTextAlignmentLeft;
     })
     .addCancelButton(@"取消", nil)
-    .addButton(@"警告", YPAlertButtonStyleWarning, NO, ^{
-        [field resignFirstResponder];
+    .addButton(^(YPAlertButton *b) {
+        b.title = @"警告";
+        b.style = YPAlertButtonStyleWarning;
+        b.autoDismiss = NO;
+        b.onPressed = ^{
+            [field resignFirstResponder];
+        };
     })
     .addFocusButton(@"确定", ^{
         

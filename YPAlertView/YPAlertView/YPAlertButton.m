@@ -17,6 +17,10 @@
 
 @implementation YPAlertButton
 
++ (instancetype)button {
+    return [YPAlertButton buttonWithType:UIButtonTypeSystem];
+}
+
 + (instancetype)buttonWithTitle:(NSString *)title style:(YPAlertButtonStyle)style onPressed:(void (^)(void))onPressed {
     YPAlertButton *button = [YPAlertButton buttonWithType:UIButtonTypeSystem];
     [button setTitle:title forState:UIControlStateNormal];
@@ -47,6 +51,11 @@
     _autoDismiss = YES;
     _style = YPAlertButtonStyleDefault;
     _cornerRadius = 5;
+}
+
+- (void)setTitle:(NSString *)title {
+    _title = [title copy];
+    [self setTitle:title forState:UIControlStateNormal];
 }
 
 - (void)setColor:(UIColor *)color forStyle:(YPAlertButtonStyle)style {

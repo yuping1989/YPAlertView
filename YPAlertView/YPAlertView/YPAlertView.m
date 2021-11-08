@@ -409,7 +409,7 @@ isIPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.b
         if (self.titleLabel.text) {
             insets = self.mTitleEdgeInsets;
         }
-        if (self.showDismissButton) {
+        if (self.mShowDismissButton) {
             insets.left += self.mDismissButtonWidth + 10;
             insets.right += self.mDismissButtonWidth + 10;
         }
@@ -733,18 +733,14 @@ ChainSetterImp(UIView *, customView, setMCustomView)
 
 - (YPAlertView *(^)(void (^)(UILabel *)))configTitleLabel {
     return ^YPAlertView *(void (^block)(UILabel *)) {
-        if (block) {
-            block(self.titleLabel);
-        }
+        if (block) block(self.titleLabel);
         return self;
     };
 }
 
 - (YPAlertView *(^)(void (^)(UILabel *)))configMessageLabel {
     return ^YPAlertView *(void (^block)(UILabel *)) {
-        if (block) {
-            block(self.messageLabel);
-        }
+        if (block) block(self.messageLabel);
         return self;
     };
 }
@@ -798,11 +794,11 @@ ChainSetterImp(UIView *, customView, setMCustomView)
     };
 }
 
-- (YPAlertView *(^)(NSString *, YPAlertButtonStyle, BOOL autoDismiss, void (^)(void)))addButton {
-    return ^YPAlertView *(NSString *title, YPAlertButtonStyle style, BOOL autoDismiss, void (^onPressed)(void)) {
-        YPAlertButton *button = [YPAlertButton buttonWithTitle:title style:style onPressed:onPressed];
-        button.autoDismiss = autoDismiss;
-        [self addButton:button];
+- (YPAlertView *(^)(void (^)(YPAlertButton *)))addButton {
+    return ^YPAlertView *(void(^config)(YPAlertButton *)) {
+        YPAlertButton *b = [YPAlertButton button];
+        if (config) config(b);
+        [self addButton:b];
         return self;
     };
 }

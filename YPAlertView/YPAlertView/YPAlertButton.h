@@ -20,14 +20,15 @@ typedef NS_ENUM(NSInteger, YPAlertButtonStyle) {
 // 进isCorner为YES时生效
 @property (nonatomic, assign) CGFloat cornerRadius UI_APPEARANCE_SELECTOR;
 
+@property (nonatomic, copy) NSString *title;
 @property (nonatomic, assign) YPAlertButtonStyle style;
 @property (nonatomic, assign) BOOL isCorner;
 @property (nonatomic, copy) void (^onPressed)(void);
-
 @property (nonatomic, assign) BOOL autoDismiss;
 
 @property (nonatomic, assign) NSInteger index;
 
++ (instancetype)button;
 + (instancetype)buttonWithTitle:(NSString *)title
                           style:(YPAlertButtonStyle)style
                       onPressed:(void (^)(void))onPressed;
